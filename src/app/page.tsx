@@ -11,7 +11,8 @@ const Container = tw.div`
   w-full
   h-full
   bg-white
-`;
+
+`
 
 const Hero = tw.div`
   h-[50vh]
@@ -32,15 +33,15 @@ const Navbar = tw.nav`
   transition-transform duration-300 ease-in-out transform
   ${(p) => (p.show ? 'translate-y-0' : '-translate-y-full')}
 `
-const NavContainer = tw.div`max-w-6xl mx-auto px-4 py-3 flex justify-between items-center`
-const Logo        = tw.div`text-2xl font-bold`
-const NavLinks    = tw.div`space-x-4`
-const NavLink     = tw.a`text-gray-700 hover:text-gray-900`
+const NavContainer = tw.div`mx-auto px-4 py-3 flex justify-between items-center`
+const Logo = tw.div`text-2xl font-bold`
+const NavLinks = tw.div`space-x-4`
+const NavLink = tw.a`text-gray-700 hover:text-gray-900`
 
-const Content = tw.div`p-8 max-w-4xl mx-auto bg-neutral-900`
+const Content = tw.div`px-20 py-4 max-w-[96vh] mx-auto bg-neutral-900 mt-0` //max-w-4xl
 
 const Page = () => {
-  const [showNavbar, setShowNavbar] = useState<true|undefined>(undefined)
+  const [showNavbar, setShowNavbar] = useState<true | undefined>(undefined)
   const heroRef = useRef<HTMLDivElement>(null)
 
   const handleScroll = () => {
@@ -69,7 +70,7 @@ const Page = () => {
 
       <Navbar show={showNavbar}>
         <NavContainer>
-          <Logo>MySite</Logo>
+          <Logo>darkshapes</Logo>
           <NavLinks>
             <NavLink href="#shadowbox">Shadowbox</NavLink>
             <NavLink href="#mir">MIR</NavLink>
@@ -80,26 +81,26 @@ const Page = () => {
       </Navbar>
 
       <Content>
-        <div className="text-6xl font-bold font-mono mb-4 w-full text-center tracking-widest">darkshapes</div>
-        <section id="shadowbox">
-          <h2 className="text-3xl font-bold mb-4">Shadowbox</h2>
-          <p>Shadowbox = sdbx + singularity</p>
+        <div className="text-[3vw] min-text-[20pt] max-h-[4vw] font-bold font-mono-sans mb-4 w-full text-right tracking-widest">darkshapes</div>
+        <section id="shadowbox" className="mt-4">
+          <h2 className="text-[1.5vw] font-bold mb-2">Shadowbox</h2>
+          <p className="text-[1vw] font-mono">Shadowbox is a generative AI instrument.</p>
         </section>
-        <section id="mir" className="mt-12">
-          <h2 className="text-3xl font-bold mb-4">Machine Intelligence Resource</h2>
-          <p>MIR is a taxonomy of ML models.</p>
+        <section id="mir" className="mt-4">
+          <h2 className="text-[1.5vw] font-bold mb-2">Machine Intelligence Resource</h2>
+          <p className="text-[1vw] font-mono">MIR is a taxonomy of ML models.</p>
         </section>
-        <section id="nnll" className="mt-12">
-          <h2 className="text-3xl font-bold mb-4">nnll</h2>
-          <p>nnll is a collection of tools for model analysis and inference.</p>
+        <section id="nnll" className="mt-4">
+          <h2 className="text-[1.5vw] font-bold mb-2">nnll</h2>
+          <p className="text-[1vw] font-mono">nnll is a collection of tools for model analysis and inference.</p>
         </section>
-        <section id="source" className="mt-12">
-          <h2 className="text-3xl font-bold mb-4">Source</h2>
-          <p>Find us on <a href="https://github.com/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">GitHub</a>.</p>
+        <section id="source" className="mt-2">
+          <h2 className="text-[1.5vw] font-bold mb-2">Source code</h2>
+          <p className="text-[1vw] font-mono mb-20">Find us on <a href="https://github.com/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">GitHub</a>.</p>
         </section>
       </Content>
     </Container>
   )
 }
 
-export default Page;
+export default Page

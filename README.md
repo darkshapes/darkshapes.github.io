@@ -1,3 +1,0 @@
-# darkshapes.org
-
-Run with `bun dev`.

@@ -1,3 +1,3 @@
 # darkshapes.org
 
-Run with `bun run dev`.
+Run with `bun dev`.

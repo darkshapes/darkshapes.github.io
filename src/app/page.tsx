@@ -39,19 +39,19 @@ const Hero = tw.div`
 //   ${(p) => (p.show ? 'translate-y-0' : '-translate-y-full')}
 // `
 // const NavContainer = tw.div`mx-auto px-4 py-3 flex justify-between items-center`
-const Logo = tw.div`text-2xl font-bold`
-const NavLinks = tw.div`space-x-4`
-const NavLink = tw.a`text-gray-700 hover:text-gray-900`
+// const Logo = tw.div`text-2xl font-bold`
+// const NavLinks = tw.div`space-x-4`
+// const NavLink = tw.a`text-gray-700 hover:text-gray-900`
 
 const Content = tw.div`px-20 py-4 max-w-[96vh] mx-auto bg-neutral-900 mt-0 text-[1.25em]` //max-w-4xl
 
 const Page = () => {
   const heroRef = useRef<HTMLDivElement>(null)
 
-  const handleScroll = () => {
-    if (!heroRef.current) return
-    const heroBottom = heroRef.current.getBoundingClientRect().bottom
-  }
+  // const handleScroll = () => {
+  // if (!heroRef.current) return
+  // const heroBottom = heroRef.current.getBoundingClientRect().bottom
+  // }
   const [heroStyle, setHeroStyle] = useState({
     maskSize: '100vw 100vh',
     scale: 'scale(1)'

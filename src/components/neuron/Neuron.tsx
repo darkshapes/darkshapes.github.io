@@ -96,7 +96,7 @@ const Neuron = () => {
         if (canvas.width !== w || canvas.height !== h) {
           canvas.width  = w
           canvas.height = h
-          regl._refresh()      // tells regl to update viewport & uniforms
+          regl.poll()      // tells regl to update viewport & uniforms
         }
     }
 

@@ -18,13 +18,8 @@ const Container = tw.div`
 
 const Hero = tw.div`
   h-[50vh]
-  flex
-  items-center
-  justify-center
-  text-white
-  text-center
-  bg-neutral-900
-  align-center
+  flex items-stretch justify-center align-center text-center
+  text-white bg-neutral-900
   m-auto
   p-0 m-0
 `
@@ -43,7 +38,22 @@ const Hero = tw.div`
 // const NavLinks = tw.div`space-x-4`
 // const NavLink = tw.a`text-gray-700 hover:text-gray-900`
 
-const Content = tw.div`px-20 py-4 max-w-[96vh] mx-auto bg-neutral-900 mt-0 text-[1.25em]` //max-w-4xl
+const Content = tw.div`
+  w-screen md:w-[100vh]
+  px-5 md:px-20 py-4
+  mx-auto mt-0
+  bg-neutral-900
+  text-base md:text-[1.25em]
+`
+
+const SectionHeader = tw.h2`
+  font-bold mt-0 mb-0 text-[1.5em] md:text-[1em]
+`
+
+const SectionDescription = tw.p`
+  text-[1em] md:text-[.75em] font-mono
+  mt-0 mb-5 md:mb-0
+`
 
 const Page = () => {
   const heroRef = useRef<HTMLDivElement>(null)
@@ -52,17 +62,18 @@ const Page = () => {
   // if (!heroRef.current) return
   // const heroBottom = heroRef.current.getBoundingClientRect().bottom
   // }
+
   const [heroStyle, setHeroStyle] = useState({
-    maskSize: '100vw 100vh',
-    scale: 'scale(1)'
+    width: '100vw',
+    maskSize: '100vh',
   })
 
   useEffect(() => {
     const updateStyle = () => {
-      const isSmallScreen = window.innerWidth <= 900
+      const isSmallScreen = window.innerWidth < 768
       setHeroStyle({
-        maskSize: isSmallScreen ? '100vh' : '100vh',
-        scale: isSmallScreen ? 'scale(.5)' : 'scale(1)',
+        width: isSmallScreen ? '100vw' : '100vh',
+        maskSize: isSmallScreen ? '100vw' : '100vh',
       })
     }
 
@@ -75,14 +86,13 @@ const Page = () => {
     <Container style={{ alignItems: 'center', justifyContent: 'center', transformOrigin: 'center center', }} >
       <Hero ref={heroRef}
         style={{
-          width: '100vh',
           margin: '0 auto',
           maskImage: `url(${Darkshapes.src})`,
           maskRepeat: 'no-repeat',
-          maskSize: heroStyle.maskSize,
           maskPosition: 'center',
+          ...heroStyle,
           justifyContent: 'center',
-          alignItems: 'center',
+          // alignItems: 'center',
           transformOrigin: 'center center',
           transition: 'transform 0.3s ease-out',
 
@@ -92,7 +102,6 @@ const Page = () => {
       </Hero>
 
       <Content style={{
-        width: '100vh',
         margin: '0 auto',
         maskPosition: 'center',
         justifyContent: 'center',
@@ -100,28 +109,28 @@ const Page = () => {
         transformOrigin: 'center center',
         transition: 'transform 0.3s ease-out',
       }} >
-        <div className="text-[3vh] min-text-[20pt] max-h-[2vw] font-bold font-mono-sans mt-0 mb-0 r-10 w-full text-right tracking-widest">darkshapes
-          <p className="text-[.5em] font-sans mt-0 mb-0">we build our answers</p>
+        <div className="text-4xl md:text-3xl lg:text-3xl min-text-[20pt] max-h-[2vw] font-bold font-mono-sans mt-0 mb-20 md:mb-0 r-10 w-full text-center md:text-right tracking-widest">darkshapes
+          <p className="text-[.6em] md:text-[.5em] font-sans mt-0 mb-0">we build our answers</p>
         </div>
         <section id="shadowbox" className="mt-2">
-          <h2 className="font-bold mt-0 mb-0">Shadowbox</h2>
-          <p className="text-[.75em] mt-0 font-mono mb-0">Shadowbox is a generative AI instrument.</p>
+          <SectionHeader>Shadowbox</SectionHeader>
+          <SectionDescription>Shadowbox is a generative AI instrument.</SectionDescription>
         </section>
         <section id="mir" className="mt-2">
-          <h2 className="font-bold mt-0 mb-0">Machine Intelligence Resource</h2>
-          <p className="text-[.75em] mt-0 font-mono mb-0">MIR is a URI taxonomy of ML models.</p>
+          <SectionHeader>Machine Intelligence Resource</SectionHeader>
+          <SectionDescription>MIR is a URI taxonomy of ML models.</SectionDescription>
         </section>
         <section id="nnll" className="mt-2">
-          <h2 className=" font-bold mt-0 mb-0">Neural Network Link Library</h2>
-          <p className="text-[.75em] mt-0 font-mono mb-0">nnll is a collection of tools for model analysis and inference.</p>
+          <SectionHeader>Neural Network Link Library</SectionHeader>
+          <SectionDescription>nnll is a collection of tools for model analysis and inference.</SectionDescription>
         </section>
         <section id="source" className="mt-2">
-          <h2 className="font-bold mt-0 mb-0">Source code</h2>
-          <p className="text-[.75em] font-mono mt-0 mb-0">Check out our <a href="https://github.com/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">GitHub</a>.</p>
+          <SectionHeader>Source code</SectionHeader>
+          <SectionDescription>Check out our <a href="https://github.com/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">GitHub</a>.</SectionDescription>
         </section>
-        <section>
-          <h2 className="font-bold mt-0 mb-0">Chat</h2>
-          <p className="text-[.75em] font-mono mt-0 mb-50">Find us on <a href="https://discord.gg/RYaJw9mPPe" className="text-blue-500 hover:text-blue-600">Discord</a>.</p>
+        <section id="chat" className="mt-2">
+          <SectionHeader>Chat</SectionHeader>
+          <SectionDescription className="mb-10 md:mb-10">Find us on <a href="https://discord.gg/RYaJw9mPPe" className="text-blue-500 hover:text-blue-600">Discord</a>.</SectionDescription>
         </section>
       </Content>
     </Container>

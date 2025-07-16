@@ -12,6 +12,8 @@ uniform float pitch;
 #define MAX_STEPS ${MAX_STEPS}
 #define EPSILON ${EPSILON}
 #define FAR_CLIP ${FAR_CLIP}
+#define THIN_START ${THIN_START}
+#define THIN_END ${THIN_END}
 
 uniform vec3 branchDirs[BRANCH_COUNT];
 uniform float bumpPos[BRANCH_COUNT];
@@ -36,7 +38,8 @@ float mapBranches(vec3 p){
         vec3 q  = p - dir*tc;
 
         float u = (tc - SPHERE_RADIUS) / cycle;
-        float taper = smoothstep(0.0, 1.0, 1.0 - u*10.5);
+        float un = clamp((u - THIN_START) / (THIN_END - THIN_START), 0.0, 1.0);
+        float taper = pow(1.0 - un, 3.0);
         float bumpWidth = 0.2;
         float bpos = bumpPos[i];
         float bump = smoothstep(bpos - bumpWidth, bpos, u)
@@ -86,10 +89,10 @@ float rayMarchWithOcclusion(vec3 ro, vec3 rd) {
 }
 
 void main() {
-    vec2 uv = (gl_FragCoord.xy - 0.5*resolution) / resolution.y;
+    vec2 uv = (gl_FragCoord.xy - 0.5 * resolution) / resolution.x;
 
     // base camera
-    vec3 ro = vec3(2.0, 0.0, 6.0);
+    vec3 ro = vec3(1.0, 0.0, 6.0);
     vec3 rd = normalize(vec3(uv, -1.5));
 
     // apply grabbed + auto-spin rotations

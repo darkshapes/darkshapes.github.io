@@ -228,21 +228,21 @@ const Nucleus = ({ r = 1 }) => (
   </mesh>
 );
 
-export function FrustumShift({ px = 150 }: { px?: number }) {
+export function FrustumShift({ ratio = 0.26 }: { ratio?: number }) {
   const { camera, size } = useThree();
 
   useLayoutEffect(() => {
     camera.setViewOffset(
       size.width,
       size.height,
-      -px / 2, // (-) so the *scene* moves right
+      size.width * ratio, // (-) so the *scene* moves left
       0,
       size.width,
       size.height,
     );
     camera.updateProjectionMatrix();
     return () => camera.clearViewOffset?.();
-  }, [camera, size, px]);
+  }, [camera, size, ratio]);
 
   return null;
 }
@@ -256,7 +256,7 @@ const Neuron = () => (
     style={{ width: "100%", height: "100%", background: "transparent" }}
   >
     <Suspense fallback={null}>
-      <FrustumShift px={-400} />
+      <FrustumShift ratio={0.26} />
 
       <Spin speedX={-0.15} speedY={0.10}>
         <Nucleus r={SPHERE_RADIUS} />

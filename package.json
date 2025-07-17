@@ -9,13 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-three/drei": "^10.5.1",
+    "@react-three/fiber": "^9.2.0",
+    "@types/three": "^0.178.1",
     "next": "15.3.4",
     "raw-loader": "^4.0.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "regl": "^2.1.1",
     "styled-components": "^6.1.19",
-    "tailwind-styled-components": "^2.2.0"
+    "tailwind-styled-components": "^2.2.0",
+    "three": "^0.178.0"
   },
   "devDependencies": {
     "typescript": "^5",

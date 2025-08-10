@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "darkshapes",
-  description: "Umbrella organization for modular, multimodal AI that serves a greater good",
+  description: "Umbrella organization rethinking machine-learning technology as tools that work for people, not just corporations",
 };
 
 export default function RootLayout({

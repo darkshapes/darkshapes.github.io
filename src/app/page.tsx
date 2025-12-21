@@ -1,4 +1,6 @@
-"use client"
+/*
+*/
+"use client";
 
 import React, { useState, useEffect, useRef } from 'react'
 import tw from 'tailwind-styled-components'
@@ -24,20 +26,6 @@ const Hero = tw.div`
   p-0 m-0
 `
 
-// const Title = tw.h1`text-5xl font-bold mb-4`
-// const Subtitle = tw.p`text-xl mb-8`
-// const Button   = tw.button`bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded`
-
-// const Navbar = tw.nav`
-//   fixed top-0 left-0 w-full bg-white shadow-md
-//   transition-transform duration-300 ease-in-out transform
-//   ${(p) => (p.show ? 'translate-y-0' : '-translate-y-full')}
-// `
-// const NavContainer = tw.div`mx-auto px-4 py-3 flex justify-between items-center`
-// const Logo = tw.div`text-2xl font-bold`
-// const NavLinks = tw.div`space-x-4`
-// const NavLink = tw.a`text-gray-700 hover:text-gray-900`
-
 const Content = tw.div`
   w-screen md:w-[100vh]
   px-5 md:px-20 py-4
@@ -47,21 +35,17 @@ const Content = tw.div`
 `
 
 const SectionHeader = tw.h2`
-  font-bold mt-0 mb-0 text-[1.5em] md:text-[1em]
+  mt-0 mb-0 text-[.9em] md:text-[.9em] font-mono-sans
 `
 
 const SectionDescription = tw.p`
-  text-[1em] md:text-[.75em] font-mono
-  mt-0 mb-5 md:mb-0
+  text-[1.2em] md:text-[.8em] font-mono-sans
+  mt-2 mb-5 md:mb-0
 `
 
 const Page = () => {
   const heroRef = useRef<HTMLDivElement>(null)
 
-  // const handleScroll = () => {
-  // if (!heroRef.current) return
-  // const heroBottom = heroRef.current.getBoundingClientRect().bottom
-  // }
 
   const [heroStyle, setHeroStyle] = useState({
     width: '100vw',
@@ -109,27 +93,29 @@ const Page = () => {
         transformOrigin: 'center center',
         transition: 'transform 0.3s ease-out',
       }} >
-        <div className="text-4xl md:text-3xl lg:text-3xl min-text-[20pt] max-h-[2vw] font-bold font-mono-sans mt-0 mb-20 md:mb-0 r-10 w-full text-center md:text-right tracking-widest">darkshapes
-          <p className="text-[.6em] md:text-[.5em] font-sans mt-0 mb-0">we build our answers</p>
+        <div className="text-4xl md:text-3xl lg:text-3xl min-text-[20pt] max-h-[2vw] font-bold mb-20 md:mb-0 r-10 w-full text-center md:text-right tracking-widest">darkshapes
+          <p className="text-[.6em] md:text-[.5em] font-sans mb-0">we build our answers</p>
         </div>
-        <section id="shadowbox" className="mt-2">
-          <SectionHeader>Shadowbox</SectionHeader>
-          <SectionDescription>Shadowbox is a generative AI instrument.</SectionDescription>
+        <section id="shadowbox">
+          <SectionHeader>
+          <p className="mt-20 mb-4 pb-5 text-left">
+            Umbrella organization rethinking machine-learning tools that work for people, not corporations.
+          </p></SectionHeader>
+          <SectionDescription><b>Shadowbox</b> is a generative AI instrument.</SectionDescription>
         </section>
-        <section id="mir" className="mt-2">
-          <SectionHeader>Machine Intelligence Resource</SectionHeader>
-          <SectionDescription>MIR is a URI taxonomy of ML models.</SectionDescription>
+        <section id="mir">
+          <SectionDescription><b>MIR</b> is a URI taxonomy of ML models.</SectionDescription>
         </section>
-        <section id="nnll" className="mt-2">
-          <SectionHeader>Neural Network Link Library</SectionHeader>
-          <SectionDescription>nnll is a collection of tools for model analysis and inference.</SectionDescription>
+        <section id="nnll">
+          <SectionDescription><b>nnll</b> is a collection of tools for model analysis and inference.</SectionDescription>
         </section>
-        <section id="source" className="mt-2">
-          <SectionHeader>Source code</SectionHeader>
-          <SectionDescription>Check out our <a href="https://github.com/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">GitHub</a>.</SectionDescription>
+        <section id="divisor">
+          <SectionDescription><b>divisor</b> is an interactive denoiser.</SectionDescription>
         </section>
-        <section id="chat" className="mt-2">
-          <SectionHeader>Chat</SectionHeader>
+        <section id="source">
+          <SectionDescription>Check out our source code on <a href="https://github.com/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">GitHub</a>.</SectionDescription>
+        </section>
+        <section id="chat">
           <SectionDescription className="mb-10 md:mb-10">Find us on <a href="https://discord.gg/RYaJw9mPPe" className="text-blue-500 hover:text-blue-600">Discord</a>.</SectionDescription>
         </section>
       </Content>

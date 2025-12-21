@@ -1,6 +1,6 @@
 darkshapes.org
 
-requires [bun](https://bun.sh)
+requires https://bun.sh
 
 ```
 git clone https://github.com/darkshapes/darkshapes.github.io

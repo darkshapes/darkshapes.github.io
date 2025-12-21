@@ -1,3 +1,9 @@
 darkshapes.org
 
-Run with `bun dev`
+requires [bun](https://bun.sh)
+
+```
+git clone https://github.com/darkshapes/darkshapes.github.io
+bun i
+bun run dev
+```

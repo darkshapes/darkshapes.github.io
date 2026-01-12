@@ -51,6 +51,57 @@
                     <a class="function" href="#mapped_cls">mapped_cls</a>
             </li>
             <li>
+                    <a class="function" href="#import_submodules">import_submodules</a>
+            </li>
+            <li>
+                    <a class="function" href="#extract_init_parameters">extract_init_parameters</a>
+            </li>
+            <li>
+                    <a class="class" href="#ClassMapEntry">ClassMapEntry</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#ClassMapEntry.__init__">ClassMapEntry</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ClassMapEntry.name">name</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ClassMapEntry.model_name">model_name</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ClassMapEntry.model">model</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ClassMapEntry.config">config</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ClassMapEntry.config_params">config_params</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ClassMapEntry.model_params">model_params</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#DocStringEntry">DocStringEntry</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#DocStringEntry.__init__">DocStringEntry</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DocStringEntry.package_name">package_name</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DocStringEntry.file_name">file_name</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DocStringEntry.doc_string">doc_string</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#DocParseData">DocParseData</a>
                             <ul class="memberlist">
                         <li>
@@ -136,112 +187,178 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="c1"># SPDX-License-Identifier: MPL-2.0 AND LicenseRef-Commons-Clause-License-Condition-1.0</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="c1"># &lt;!-- // /*  d a r k s h a p e s */ --&gt;</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">mir.config.json_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_json_file</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">transformers.models.auto.modeling_auto</span><span class="w"> </span><span class="kn">import</span> <span class="n">MODEL_MAPPING</span><span class="p">,</span> <span class="n">MODEL_MAPPING_NAMES</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">transformers</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">transformers.models.auto.configuration_auto</span><span class="w"> </span><span class="kn">import</span> <span class="n">CONFIG_MAPPING_NAMES</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">transformers</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">transformers.models.auto.modeling_auto</span><span class="w"> </span><span class="kn">import</span> <span class="n">MODEL_MAPPING</span><span class="p">,</span> <span class="n">MODEL_MAPPING_NAMES</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="k">def</span><span class="w"> </span><span class="nf">mapped_cls</span><span class="p">(</span><span class="n">model_identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get model class from identifier without calling huggingface_hub.</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="sd">    </span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="sd">    :param model_identifier: Model identifier like &quot;bert-base-uncased&quot; or &quot;gpt2&quot;</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="sd">    :return: Model class (e.g., BertModel, GPT2Model)</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>    <span class="c1"># Extract code name from model identifier (e.g., &quot;bert-base-uncased&quot; -&gt; &quot;bert&quot;)</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>    <span class="c1"># Handle various formats: &quot;bert-base-uncased&quot;, &quot;gpt2&quot;, &quot;microsoft/DialoGPT-medium&quot;</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a>    <span class="n">code_name</span> <span class="o">=</span> <span class="n">model_identifier</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>    
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>    <span class="c1"># Method 1: Direct lookup via MODEL_MAPPING_NAMES (simplest)</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">mir.config.json_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_json_file</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">mir.config.console</span><span class="w"> </span><span class="kn">import</span> <span class="n">nfo</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>
+</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="k">def</span><span class="w"> </span><span class="nf">mapped_cls</span><span class="p">(</span><span class="n">model_identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get model class from identifier without calling huggingface_hub.\n</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="sd">    :param model_identifier: Model identifier like &quot;bert-base-uncased&quot; or &quot;gpt2&quot;</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="sd">    :return: Model class (e.g., BertModel, GPT2Model)</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>    <span class="n">code_name</span> <span class="o">=</span> <span class="n">model_identifier</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>    <span class="n">model_class_name</span> <span class="o">=</span> <span class="n">MODEL_MAPPING_NAMES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>    
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>    <span class="c1"># Method 2: Via config class lookup (matches _get_model_class behavior more closely)</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>    <span class="n">config_class_name</span> <span class="o">=</span> <span class="n">CONFIG_MAPPING_NAMES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code_name</span><span class="p">)</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>    <span class="k">if</span> <span class="n">config_class_name</span><span class="p">:</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>        <span class="n">config_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">transformers</span><span class="p">,</span> <span class="n">config_class_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>        <span class="k">if</span> <span class="n">config_class</span><span class="p">:</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>            <span class="c1"># Look up in MODEL_MAPPING using config class</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>            <span class="n">model_class</span> <span class="o">=</span> <span class="n">MODEL_MAPPING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">config_class</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>            <span class="k">if</span> <span class="n">model_class</span><span class="p">:</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>                    <span class="n">model_class</span> <span class="o">=</span> <span class="n">model_class</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>                    <span class="k">return</span> <span class="n">model_class</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>    
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>    <span class="c1"># Fallback: try with normalized code name (handle underscores/dashes)</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>    <span class="n">normalized</span> <span class="o">=</span> <span class="n">code_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>    <span class="k">if</span> <span class="n">normalized</span> <span class="o">!=</span> <span class="n">code_name</span><span class="p">:</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;normalized: </span><span class="si">{</span><span class="n">normalized</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>        <span class="n">model_class_name</span> <span class="o">=</span> <span class="n">MODEL_MAPPING_NAMES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">normalized</span><span class="p">,</span>  <span class="kc">None</span><span class="p">)</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>        <span class="k">if</span> <span class="n">model_class_name</span><span class="p">:</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">transformers</span><span class="p">,</span> <span class="n">model_class_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>    <span class="k">if</span> <span class="n">model_class_name</span><span class="p">:</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_class_name</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>            <span class="n">model_class_name</span> <span class="o">=</span> <span class="n">model_class_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">transformers</span><span class="p">,</span> <span class="n">model_class_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>    <span class="k">return</span> <span class="kc">None</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>    <span class="n">config_class_name</span> <span class="o">=</span> <span class="n">CONFIG_MAPPING_NAMES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code_name</span><span class="p">)</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>    <span class="k">if</span> <span class="n">config_class_name</span><span class="p">:</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>        <span class="n">config_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">transformers</span><span class="p">,</span> <span class="n">config_class_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>        <span class="k">if</span> <span class="n">config_class</span><span class="p">:</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>            <span class="n">model_class</span> <span class="o">=</span> <span class="n">MODEL_MAPPING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">config_class</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>            <span class="k">if</span> <span class="n">model_class</span><span class="p">:</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>                    <span class="n">model_class</span> <span class="o">=</span> <span class="n">model_class</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>                    <span class="k">return</span> <span class="n">model_class</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>    <span class="n">normalized</span> <span class="o">=</span> <span class="n">code_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>    <span class="k">if</span> <span class="n">normalized</span> <span class="o">!=</span> <span class="n">code_name</span><span class="p">:</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>        <span class="k">if</span> <span class="n">model_class_name</span> <span class="o">:=</span> <span class="n">MODEL_MAPPING_NAMES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">normalized</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_class_name</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>                <span class="n">model_class_name</span> <span class="o">=</span> <span class="n">model_class_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">transformers</span><span class="p">,</span> <span class="n">model_class_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>    <span class="k">return</span> <span class="kc">None</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="k">def</span><span class="w"> </span><span class="nf">import_submodules</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pkg_name_or_abs_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert two strings into a callable function or property\n</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">    :param module: The name of the module to import</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="sd">    :param library_path: Base package for the module</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="sd">    :return: The callable attribute or property</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">importlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">import_module</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DocParseData</span><span class="p">:</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>    <span class="n">pipe_class</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    <span class="n">pipe_repo</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>    <span class="n">staged_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    <span class="n">staged_repo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipe_class</span><span class="p">,</span> <span class="n">pipe_repo</span><span class="p">,</span> <span class="n">staged_class</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">staged_repo</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_class</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pipe_class</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pipe_repo</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">staged_class</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">staged_class</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">staged_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">staged_repo</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>    <span class="n">module</span> <span class="o">=</span> <span class="n">module_name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>    <span class="n">library</span> <span class="o">=</span> <span class="n">pkg_name_or_abs_path</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>        <span class="n">base_library</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">library</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>        <span class="n">base_library</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>        <span class="n">nfo</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Syntax error attempting to import </span><span class="si">{</span><span class="n">module_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>    <span class="k">if</span> <span class="n">module</span> <span class="o">:=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">base_library</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>        <span class="k">return</span> <span class="n">module</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>        <span class="n">nfo</span><span class="p">(</span><span class="s2">&quot;failed to find module </span><span class="si">{module}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DocStringParserConstants</span><span class="p">:</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Constants used by DocStringParser for parsing docstrings.&quot;&quot;&quot;</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>    <span class="n">pipe_prefixes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>        <span class="s2">&quot;&gt;&gt;&gt; motion_adapter = &quot;</span><span class="p">,</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>        <span class="s2">&quot;&gt;&gt;&gt; adapter = &quot;</span><span class="p">,</span>  <span class="c1"># if this moves, also change motion_adapter check</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>        <span class="s2">&quot;&gt;&gt;&gt; controlnet = &quot;</span><span class="p">,</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>        <span class="s2">&quot;&gt;&gt;&gt; pipe_prior = &quot;</span><span class="p">,</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>        <span class="s2">&quot;&gt;&gt;&gt; pipe = &quot;</span><span class="p">,</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>        <span class="s2">&quot;&gt;&gt;&gt; pipeline = &quot;</span><span class="p">,</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>        <span class="s2">&quot;&gt;&gt;&gt; blip_diffusion_pipe = &quot;</span><span class="p">,</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>        <span class="s2">&quot;&gt;&gt;&gt; prior_pipe = &quot;</span><span class="p">,</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>        <span class="s2">&quot;&gt;&gt;&gt; gen_pipe = &quot;</span><span class="p">,</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>    <span class="p">]</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>    <span class="n">repo_variables</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>        <span class="s2">&quot;controlnet_model&quot;</span><span class="p">,</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>        <span class="s2">&quot;controlnet_id&quot;</span><span class="p">,</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>        <span class="s2">&quot;base_model&quot;</span><span class="p">,</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>        <span class="s2">&quot;model_id_or_path&quot;</span><span class="p">,</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>        <span class="s2">&quot;model_ckpt&quot;</span><span class="p">,</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>        <span class="s2">&quot;model_id&quot;</span><span class="p">,</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>        <span class="s2">&quot;repo_base&quot;</span><span class="p">,</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>        <span class="s2">&quot;repo&quot;</span><span class="p">,</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        <span class="s2">&quot;motion_adapter_id&quot;</span><span class="p">,</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>    <span class="p">]</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>    <span class="n">call_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.from_pretrained(&quot;</span><span class="p">,</span> <span class="s2">&quot;.from_single_file(&quot;</span><span class="p">]</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    <span class="n">staged_call_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>        <span class="s2">&quot;.from_pretrain(&quot;</span><span class="p">,</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>    <span class="p">]</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="n">package_map</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>    <span class="s2">&quot;diffusers&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;_import_structure&quot;</span><span class="p">,</span> <span class="s2">&quot;diffusers.pipelines&quot;</span><span class="p">),</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="s2">&quot;transformers&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;MODEL_MAPPING_NAMES&quot;</span><span class="p">,</span> <span class="s2">&quot;transformers.models.auto.modeling_auto&quot;</span><span class="p">),</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="p">}</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="n">root_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s2">&quot;mir&quot;</span><span class="p">)</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="n">versions</span> <span class="o">=</span> <span class="n">read_json_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="s2">&quot;spec&quot;</span><span class="p">,</span> <span class="s2">&quot;versions.json&quot;</span><span class="p">))</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="n">template</span> <span class="o">=</span> <span class="n">read_json_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="s2">&quot;spec&quot;</span><span class="p">,</span> <span class="s2">&quot;template.json&quot;</span><span class="p">))</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="nb">print</span><span class="p">(</span><span class="n">root_path</span><span class="p">)</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="n">MIR_PATH_NAMED</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="s2">&quot;mir.json&quot;</span><span class="p">)</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="k">def</span><span class="w"> </span><span class="nf">extract_init_parameters</span><span class="p">(</span><span class="n">module</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">package_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Pick apart a Diffusers or Transformers pipeline class and find its constituent parts (formerly root_class)\n</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">    :param module: Origin pipeline as a class or as a string</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">    :param library: name of a library to import the class from, only if a string is provided</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">    :return: Dictionary of sub-classes from the `module`&quot;&quot;&quot;</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>    <span class="k">if</span> <span class="n">package_name</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>        <span class="n">module_obj</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">import_submodules</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">package_name</span><span class="p">)</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">Callable</span><span class="p">)</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>        <span class="n">module_obj</span> <span class="o">=</span> <span class="n">module</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>    <span class="n">signature</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">module_obj</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>    <span class="n">class_names</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>    <span class="n">editable_signature</span> <span class="o">=</span> <span class="n">signature</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>    <span class="n">editable_signature</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;self&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>    <span class="n">editable_signature</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;kwargs&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    <span class="n">editable_signature</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;use_cache&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>    <span class="k">for</span> <span class="n">folder</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">editable_signature</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>        <span class="n">class_names</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>    <span class="k">return</span> <span class="n">class_names</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="nd">@dataclass</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ClassMapEntry</span><span class="p">:</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a structured entry of the name of the class and its associated attributes.&quot;&quot;&quot;</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>    <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>    <span class="n">model</span><span class="p">:</span> <span class="n">Callable</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>    <span class="n">config</span><span class="p">:</span> <span class="n">Callable</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>    <span class="n">config_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{})</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="n">model_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">model_params</span> <span class="o">=</span> <span class="n">extract_init_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">config_params</span> <span class="o">=</span> <span class="n">extract_init_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
 </span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="n">BREAKING_SUFFIX</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;.*(?:-)(prior)$|.*(?:-)(diffusers)$|.*[_-](\d{3,4}px|-T2V$|-I2V$)&quot;</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="n">PARAMETERS_SUFFIX</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;(\d{1,4}[KkMmBb]|[._-]\d+[\._-]\d+[Bb][._-]).*?$&quot;</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="n">SEARCH_SUFFIX</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\d+[._-]?\d+[BbMmKk](it)?|[._-]\d+[BbMmKk](it)?&quot;</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="nd">@dataclass</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DocStringEntry</span><span class="p">:</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a structured entry of package name, file name, and docstring.&quot;&quot;&quot;</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>    <span class="n">package_name</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>    <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>    <span class="n">doc_string</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DocParseData</span><span class="p">:</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>    <span class="n">pipe_class</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>    <span class="n">pipe_repo</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>    <span class="n">staged_class</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>    <span class="n">staged_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipe_class</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pipe_repo</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">staged_class</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">staged_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_class</span> <span class="o">=</span> <span class="n">pipe_class</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_repo</span> <span class="o">=</span> <span class="n">pipe_repo</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">staged_class</span> <span class="o">=</span> <span class="n">staged_class</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">staged_repo</span> <span class="o">=</span> <span class="n">staged_repo</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DocStringParserConstants</span><span class="p">:</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Constants used by DocStringParser for parsing docstrings.&quot;&quot;&quot;</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>    <span class="n">pipe_prefixes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>        <span class="s2">&quot;&gt;&gt;&gt; motion_adapter = &quot;</span><span class="p">,</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>        <span class="s2">&quot;&gt;&gt;&gt; adapter = &quot;</span><span class="p">,</span>  <span class="c1"># if this moves, also change motion_adapter check</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>        <span class="s2">&quot;&gt;&gt;&gt; controlnet = &quot;</span><span class="p">,</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>        <span class="s2">&quot;&gt;&gt;&gt; super_res_1_pipe = &quot;</span><span class="p">,</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>        <span class="s2">&quot;&gt;&gt;&gt; pipe_prior = &quot;</span><span class="p">,</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>        <span class="s2">&quot;&gt;&gt;&gt; pipe_prior_redux = &quot;</span><span class="p">,</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>        <span class="s2">&quot;&gt;&gt;&gt; pipe = &quot;</span><span class="p">,</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>        <span class="s2">&quot;&gt;&gt;&gt; pipeline = &quot;</span><span class="p">,</span>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>        <span class="s2">&quot;&gt;&gt;&gt; blip_diffusion_pipe = &quot;</span><span class="p">,</span>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>        <span class="s2">&quot;&gt;&gt;&gt; prior_pipe = &quot;</span><span class="p">,</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>        <span class="s2">&quot;&gt;&gt;&gt; gen_pipe = &quot;</span><span class="p">,</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>        <span class="s2">&quot;pipe = &quot;</span><span class="p">,</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>    <span class="p">]</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>    <span class="n">repo_variables</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>        <span class="s2">&quot;controlnet_model&quot;</span><span class="p">,</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>        <span class="s2">&quot;controlnet_id&quot;</span><span class="p">,</span>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>        <span class="s2">&quot;base_model&quot;</span><span class="p">,</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>        <span class="s2">&quot;model_id_or_path&quot;</span><span class="p">,</span>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>        <span class="s2">&quot;model_ckpt&quot;</span><span class="p">,</span>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>        <span class="s2">&quot;model_id&quot;</span><span class="p">,</span>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>        <span class="s2">&quot;repo_base&quot;</span><span class="p">,</span>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>        <span class="s2">&quot;repo&quot;</span><span class="p">,</span>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>        <span class="s2">&quot;motion_adapter_id&quot;</span><span class="p">,</span>
+</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>    <span class="p">]</span>
+</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>    <span class="n">call_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.from_pretrained(&quot;</span><span class="p">,</span> <span class="s2">&quot;.from_single_file(&quot;</span><span class="p">]</span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>    <span class="n">staged_call_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>        <span class="s2">&quot;.from_pretrain(&quot;</span><span class="p">,</span>
+</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>    <span class="p">]</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>
+</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>
+</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a><span class="n">package_map</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>    <span class="s2">&quot;diffusers&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;_import_structure&quot;</span><span class="p">,</span> <span class="s2">&quot;diffusers.pipelines&quot;</span><span class="p">),</span>
+</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>    <span class="s2">&quot;transformers&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;MODEL_MAPPING_NAMES&quot;</span><span class="p">,</span> <span class="s2">&quot;transformers.models.auto.modeling_auto&quot;</span><span class="p">),</span>
+</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a><span class="p">}</span>
+</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a><span class="n">root_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s2">&quot;mir&quot;</span><span class="p">)</span>
+</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a><span class="n">versions</span> <span class="o">=</span> <span class="n">read_json_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="s2">&quot;spec&quot;</span><span class="p">,</span> <span class="s2">&quot;versions.json&quot;</span><span class="p">))</span>
+</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a><span class="n">template</span> <span class="o">=</span> <span class="n">read_json_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="s2">&quot;spec&quot;</span><span class="p">,</span> <span class="s2">&quot;template.json&quot;</span><span class="p">))</span>
+</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a><span class="n">MIR_PATH_NAMED</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="s2">&quot;mir.json&quot;</span><span class="p">)</span>
+</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>
+</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a><span class="n">BREAKING_SUFFIX</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;.*(?:-)(prior)$|.*(?:-)(diffusers)$|.*[_-](\d{3,4}px|-T2V$|-I2V$)&quot;</span>
+</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a><span class="n">PARAMETERS_SUFFIX</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;(\d{1,4}[KkMmBb]|[._-]\d+[\._-]\d+[Bb][._-]).*?$&quot;</span>
+</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a><span class="n">SEARCH_SUFFIX</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\d+[._-]?\d+[BbMmKk](it)?|[._-]\d+[BbMmKk](it)?&quot;</span>
 </span></pre></div>
 
 
@@ -257,45 +374,33 @@
 
     </div>
     <a class="headerlink" href="#mapped_cls"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="mapped_cls-12"><a href="#mapped_cls-12"><span class="linenos">12</span></a><span class="k">def</span><span class="w"> </span><span class="nf">mapped_cls</span><span class="p">(</span><span class="n">model_identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="mapped_cls-13"><a href="#mapped_cls-13"><span class="linenos">13</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get model class from identifier without calling huggingface_hub.</span>
-</span><span id="mapped_cls-14"><a href="#mapped_cls-14"><span class="linenos">14</span></a><span class="sd">    </span>
-</span><span id="mapped_cls-15"><a href="#mapped_cls-15"><span class="linenos">15</span></a><span class="sd">    :param model_identifier: Model identifier like &quot;bert-base-uncased&quot; or &quot;gpt2&quot;</span>
-</span><span id="mapped_cls-16"><a href="#mapped_cls-16"><span class="linenos">16</span></a><span class="sd">    :return: Model class (e.g., BertModel, GPT2Model)</span>
-</span><span id="mapped_cls-17"><a href="#mapped_cls-17"><span class="linenos">17</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="mapped_cls-18"><a href="#mapped_cls-18"><span class="linenos">18</span></a>    <span class="c1"># Extract code name from model identifier (e.g., &quot;bert-base-uncased&quot; -&gt; &quot;bert&quot;)</span>
-</span><span id="mapped_cls-19"><a href="#mapped_cls-19"><span class="linenos">19</span></a>    <span class="c1"># Handle various formats: &quot;bert-base-uncased&quot;, &quot;gpt2&quot;, &quot;microsoft/DialoGPT-medium&quot;</span>
-</span><span id="mapped_cls-20"><a href="#mapped_cls-20"><span class="linenos">20</span></a>    <span class="n">code_name</span> <span class="o">=</span> <span class="n">model_identifier</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-</span><span id="mapped_cls-21"><a href="#mapped_cls-21"><span class="linenos">21</span></a>    
-</span><span id="mapped_cls-22"><a href="#mapped_cls-22"><span class="linenos">22</span></a>    <span class="c1"># Method 1: Direct lookup via MODEL_MAPPING_NAMES (simplest)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="mapped_cls-16"><a href="#mapped_cls-16"><span class="linenos">16</span></a><span class="k">def</span><span class="w"> </span><span class="nf">mapped_cls</span><span class="p">(</span><span class="n">model_identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="mapped_cls-17"><a href="#mapped_cls-17"><span class="linenos">17</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get model class from identifier without calling huggingface_hub.\n</span>
+</span><span id="mapped_cls-18"><a href="#mapped_cls-18"><span class="linenos">18</span></a><span class="sd">    :param model_identifier: Model identifier like &quot;bert-base-uncased&quot; or &quot;gpt2&quot;</span>
+</span><span id="mapped_cls-19"><a href="#mapped_cls-19"><span class="linenos">19</span></a><span class="sd">    :return: Model class (e.g., BertModel, GPT2Model)</span>
+</span><span id="mapped_cls-20"><a href="#mapped_cls-20"><span class="linenos">20</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="mapped_cls-21"><a href="#mapped_cls-21"><span class="linenos">21</span></a>    <span class="n">code_name</span> <span class="o">=</span> <span class="n">model_identifier</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</span><span id="mapped_cls-22"><a href="#mapped_cls-22"><span class="linenos">22</span></a>
 </span><span id="mapped_cls-23"><a href="#mapped_cls-23"><span class="linenos">23</span></a>    <span class="n">model_class_name</span> <span class="o">=</span> <span class="n">MODEL_MAPPING_NAMES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 </span><span id="mapped_cls-24"><a href="#mapped_cls-24"><span class="linenos">24</span></a>
-</span><span id="mapped_cls-25"><a href="#mapped_cls-25"><span class="linenos">25</span></a>    
-</span><span id="mapped_cls-26"><a href="#mapped_cls-26"><span class="linenos">26</span></a>    <span class="c1"># Method 2: Via config class lookup (matches _get_model_class behavior more closely)</span>
-</span><span id="mapped_cls-27"><a href="#mapped_cls-27"><span class="linenos">27</span></a>    <span class="n">config_class_name</span> <span class="o">=</span> <span class="n">CONFIG_MAPPING_NAMES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code_name</span><span class="p">)</span>
-</span><span id="mapped_cls-28"><a href="#mapped_cls-28"><span class="linenos">28</span></a>    <span class="k">if</span> <span class="n">config_class_name</span><span class="p">:</span>
-</span><span id="mapped_cls-29"><a href="#mapped_cls-29"><span class="linenos">29</span></a>        <span class="n">config_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">transformers</span><span class="p">,</span> <span class="n">config_class_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="mapped_cls-30"><a href="#mapped_cls-30"><span class="linenos">30</span></a>        <span class="k">if</span> <span class="n">config_class</span><span class="p">:</span>
-</span><span id="mapped_cls-31"><a href="#mapped_cls-31"><span class="linenos">31</span></a>            <span class="c1"># Look up in MODEL_MAPPING using config class</span>
-</span><span id="mapped_cls-32"><a href="#mapped_cls-32"><span class="linenos">32</span></a>            <span class="n">model_class</span> <span class="o">=</span> <span class="n">MODEL_MAPPING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">config_class</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="mapped_cls-33"><a href="#mapped_cls-33"><span class="linenos">33</span></a>            <span class="k">if</span> <span class="n">model_class</span><span class="p">:</span>
-</span><span id="mapped_cls-34"><a href="#mapped_cls-34"><span class="linenos">34</span></a>                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-</span><span id="mapped_cls-35"><a href="#mapped_cls-35"><span class="linenos">35</span></a>                    <span class="n">model_class</span> <span class="o">=</span> <span class="n">model_class</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="mapped_cls-36"><a href="#mapped_cls-36"><span class="linenos">36</span></a>                    <span class="k">return</span> <span class="n">model_class</span>
-</span><span id="mapped_cls-37"><a href="#mapped_cls-37"><span class="linenos">37</span></a>    
-</span><span id="mapped_cls-38"><a href="#mapped_cls-38"><span class="linenos">38</span></a>    <span class="c1"># Fallback: try with normalized code name (handle underscores/dashes)</span>
-</span><span id="mapped_cls-39"><a href="#mapped_cls-39"><span class="linenos">39</span></a>    <span class="n">normalized</span> <span class="o">=</span> <span class="n">code_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
-</span><span id="mapped_cls-40"><a href="#mapped_cls-40"><span class="linenos">40</span></a>    <span class="k">if</span> <span class="n">normalized</span> <span class="o">!=</span> <span class="n">code_name</span><span class="p">:</span>
-</span><span id="mapped_cls-41"><a href="#mapped_cls-41"><span class="linenos">41</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;normalized: </span><span class="si">{</span><span class="n">normalized</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="mapped_cls-42"><a href="#mapped_cls-42"><span class="linenos">42</span></a>        <span class="n">model_class_name</span> <span class="o">=</span> <span class="n">MODEL_MAPPING_NAMES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">normalized</span><span class="p">,</span>  <span class="kc">None</span><span class="p">)</span>
-</span><span id="mapped_cls-43"><a href="#mapped_cls-43"><span class="linenos">43</span></a>        <span class="k">if</span> <span class="n">model_class_name</span><span class="p">:</span>
-</span><span id="mapped_cls-44"><a href="#mapped_cls-44"><span class="linenos">44</span></a>            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">transformers</span><span class="p">,</span> <span class="n">model_class_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="mapped_cls-45"><a href="#mapped_cls-45"><span class="linenos">45</span></a>    <span class="k">if</span> <span class="n">model_class_name</span><span class="p">:</span>
-</span><span id="mapped_cls-46"><a href="#mapped_cls-46"><span class="linenos">46</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_class_name</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-</span><span id="mapped_cls-47"><a href="#mapped_cls-47"><span class="linenos">47</span></a>            <span class="n">model_class_name</span> <span class="o">=</span> <span class="n">model_class_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="mapped_cls-48"><a href="#mapped_cls-48"><span class="linenos">48</span></a>        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">transformers</span><span class="p">,</span> <span class="n">model_class_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="mapped_cls-49"><a href="#mapped_cls-49"><span class="linenos">49</span></a>
-</span><span id="mapped_cls-50"><a href="#mapped_cls-50"><span class="linenos">50</span></a>    <span class="k">return</span> <span class="kc">None</span>
+</span><span id="mapped_cls-25"><a href="#mapped_cls-25"><span class="linenos">25</span></a>    <span class="n">config_class_name</span> <span class="o">=</span> <span class="n">CONFIG_MAPPING_NAMES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code_name</span><span class="p">)</span>
+</span><span id="mapped_cls-26"><a href="#mapped_cls-26"><span class="linenos">26</span></a>    <span class="k">if</span> <span class="n">config_class_name</span><span class="p">:</span>
+</span><span id="mapped_cls-27"><a href="#mapped_cls-27"><span class="linenos">27</span></a>        <span class="n">config_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">transformers</span><span class="p">,</span> <span class="n">config_class_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="mapped_cls-28"><a href="#mapped_cls-28"><span class="linenos">28</span></a>        <span class="k">if</span> <span class="n">config_class</span><span class="p">:</span>
+</span><span id="mapped_cls-29"><a href="#mapped_cls-29"><span class="linenos">29</span></a>            <span class="n">model_class</span> <span class="o">=</span> <span class="n">MODEL_MAPPING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">config_class</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="mapped_cls-30"><a href="#mapped_cls-30"><span class="linenos">30</span></a>            <span class="k">if</span> <span class="n">model_class</span><span class="p">:</span>
+</span><span id="mapped_cls-31"><a href="#mapped_cls-31"><span class="linenos">31</span></a>                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+</span><span id="mapped_cls-32"><a href="#mapped_cls-32"><span class="linenos">32</span></a>                    <span class="n">model_class</span> <span class="o">=</span> <span class="n">model_class</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="mapped_cls-33"><a href="#mapped_cls-33"><span class="linenos">33</span></a>                    <span class="k">return</span> <span class="n">model_class</span>
+</span><span id="mapped_cls-34"><a href="#mapped_cls-34"><span class="linenos">34</span></a>
+</span><span id="mapped_cls-35"><a href="#mapped_cls-35"><span class="linenos">35</span></a>    <span class="n">normalized</span> <span class="o">=</span> <span class="n">code_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+</span><span id="mapped_cls-36"><a href="#mapped_cls-36"><span class="linenos">36</span></a>    <span class="k">if</span> <span class="n">normalized</span> <span class="o">!=</span> <span class="n">code_name</span><span class="p">:</span>
+</span><span id="mapped_cls-37"><a href="#mapped_cls-37"><span class="linenos">37</span></a>        <span class="k">if</span> <span class="n">model_class_name</span> <span class="o">:=</span> <span class="n">MODEL_MAPPING_NAMES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">normalized</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="mapped_cls-38"><a href="#mapped_cls-38"><span class="linenos">38</span></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_class_name</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+</span><span id="mapped_cls-39"><a href="#mapped_cls-39"><span class="linenos">39</span></a>                <span class="n">model_class_name</span> <span class="o">=</span> <span class="n">model_class_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="mapped_cls-40"><a href="#mapped_cls-40"><span class="linenos">40</span></a>            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">transformers</span><span class="p">,</span> <span class="n">model_class_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="mapped_cls-41"><a href="#mapped_cls-41"><span class="linenos">41</span></a>
+</span><span id="mapped_cls-42"><a href="#mapped_cls-42"><span class="linenos">42</span></a>    <span class="k">return</span> <span class="kc">None</span>
 </span></pre></div>
 
 
@@ -316,6 +421,298 @@
 
 
                 </section>
+                <section id="import_submodules">
+                            <input id="import_submodules-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">import_submodules</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span>, </span><span class="param"><span class="n">pkg_name_or_abs_path</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span>:</span></span>
+
+                <label class="view-source-button" for="import_submodules-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#import_submodules"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="import_submodules-45"><a href="#import_submodules-45"><span class="linenos">45</span></a><span class="k">def</span><span class="w"> </span><span class="nf">import_submodules</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pkg_name_or_abs_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="import_submodules-46"><a href="#import_submodules-46"><span class="linenos">46</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert two strings into a callable function or property\n</span>
+</span><span id="import_submodules-47"><a href="#import_submodules-47"><span class="linenos">47</span></a><span class="sd">    :param module: The name of the module to import</span>
+</span><span id="import_submodules-48"><a href="#import_submodules-48"><span class="linenos">48</span></a><span class="sd">    :param library_path: Base package for the module</span>
+</span><span id="import_submodules-49"><a href="#import_submodules-49"><span class="linenos">49</span></a><span class="sd">    :return: The callable attribute or property</span>
+</span><span id="import_submodules-50"><a href="#import_submodules-50"><span class="linenos">50</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="import_submodules-51"><a href="#import_submodules-51"><span class="linenos">51</span></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">importlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">import_module</span>
+</span><span id="import_submodules-52"><a href="#import_submodules-52"><span class="linenos">52</span></a>
+</span><span id="import_submodules-53"><a href="#import_submodules-53"><span class="linenos">53</span></a>    <span class="n">module</span> <span class="o">=</span> <span class="n">module_name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</span><span id="import_submodules-54"><a href="#import_submodules-54"><span class="linenos">54</span></a>    <span class="n">library</span> <span class="o">=</span> <span class="n">pkg_name_or_abs_path</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</span><span id="import_submodules-55"><a href="#import_submodules-55"><span class="linenos">55</span></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="import_submodules-56"><a href="#import_submodules-56"><span class="linenos">56</span></a>        <span class="n">base_library</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">library</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span>
+</span><span id="import_submodules-57"><a href="#import_submodules-57"><span class="linenos">57</span></a>    <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+</span><span id="import_submodules-58"><a href="#import_submodules-58"><span class="linenos">58</span></a>        <span class="n">base_library</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="import_submodules-59"><a href="#import_submodules-59"><span class="linenos">59</span></a>        <span class="n">nfo</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Syntax error attempting to import </span><span class="si">{</span><span class="n">module_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="import_submodules-60"><a href="#import_submodules-60"><span class="linenos">60</span></a>    <span class="k">if</span> <span class="n">module</span> <span class="o">:=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">base_library</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="import_submodules-61"><a href="#import_submodules-61"><span class="linenos">61</span></a>        <span class="k">return</span> <span class="n">module</span>
+</span><span id="import_submodules-62"><a href="#import_submodules-62"><span class="linenos">62</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="import_submodules-63"><a href="#import_submodules-63"><span class="linenos">63</span></a>        <span class="n">nfo</span><span class="p">(</span><span class="s2">&quot;failed to find module </span><span class="si">{module}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Convert two strings into a callable function or property</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>module</strong>:  The name of the module to import</li>
+<li><strong>library_path</strong>:  Base package for the module</li>
+</ul>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <p>The callable attribute or property</p>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="extract_init_parameters">
+                            <input id="extract_init_parameters-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">extract_init_parameters</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">module</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>,</span><span class="param">	<span class="n">package_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>:</span></span>
+
+                <label class="view-source-button" for="extract_init_parameters-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#extract_init_parameters"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="extract_init_parameters-66"><a href="#extract_init_parameters-66"><span class="linenos">66</span></a><span class="k">def</span><span class="w"> </span><span class="nf">extract_init_parameters</span><span class="p">(</span><span class="n">module</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">package_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="extract_init_parameters-67"><a href="#extract_init_parameters-67"><span class="linenos">67</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Pick apart a Diffusers or Transformers pipeline class and find its constituent parts (formerly root_class)\n</span>
+</span><span id="extract_init_parameters-68"><a href="#extract_init_parameters-68"><span class="linenos">68</span></a><span class="sd">    :param module: Origin pipeline as a class or as a string</span>
+</span><span id="extract_init_parameters-69"><a href="#extract_init_parameters-69"><span class="linenos">69</span></a><span class="sd">    :param library: name of a library to import the class from, only if a string is provided</span>
+</span><span id="extract_init_parameters-70"><a href="#extract_init_parameters-70"><span class="linenos">70</span></a><span class="sd">    :return: Dictionary of sub-classes from the `module`&quot;&quot;&quot;</span>
+</span><span id="extract_init_parameters-71"><a href="#extract_init_parameters-71"><span class="linenos">71</span></a>
+</span><span id="extract_init_parameters-72"><a href="#extract_init_parameters-72"><span class="linenos">72</span></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+</span><span id="extract_init_parameters-73"><a href="#extract_init_parameters-73"><span class="linenos">73</span></a>
+</span><span id="extract_init_parameters-74"><a href="#extract_init_parameters-74"><span class="linenos">74</span></a>    <span class="k">if</span> <span class="n">package_name</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="extract_init_parameters-75"><a href="#extract_init_parameters-75"><span class="linenos">75</span></a>        <span class="n">module_obj</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">import_submodules</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">package_name</span><span class="p">)</span>
+</span><span id="extract_init_parameters-76"><a href="#extract_init_parameters-76"><span class="linenos">76</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="extract_init_parameters-77"><a href="#extract_init_parameters-77"><span class="linenos">77</span></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">Callable</span><span class="p">)</span>
+</span><span id="extract_init_parameters-78"><a href="#extract_init_parameters-78"><span class="linenos">78</span></a>        <span class="n">module_obj</span> <span class="o">=</span> <span class="n">module</span>
+</span><span id="extract_init_parameters-79"><a href="#extract_init_parameters-79"><span class="linenos">79</span></a>    <span class="n">signature</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">module_obj</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span>
+</span><span id="extract_init_parameters-80"><a href="#extract_init_parameters-80"><span class="linenos">80</span></a>    <span class="n">class_names</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="extract_init_parameters-81"><a href="#extract_init_parameters-81"><span class="linenos">81</span></a>    <span class="n">editable_signature</span> <span class="o">=</span> <span class="n">signature</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="extract_init_parameters-82"><a href="#extract_init_parameters-82"><span class="linenos">82</span></a>    <span class="n">editable_signature</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;self&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="extract_init_parameters-83"><a href="#extract_init_parameters-83"><span class="linenos">83</span></a>    <span class="n">editable_signature</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;kwargs&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="extract_init_parameters-84"><a href="#extract_init_parameters-84"><span class="linenos">84</span></a>    <span class="n">editable_signature</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;use_cache&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="extract_init_parameters-85"><a href="#extract_init_parameters-85"><span class="linenos">85</span></a>    <span class="k">for</span> <span class="n">folder</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">editable_signature</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="extract_init_parameters-86"><a href="#extract_init_parameters-86"><span class="linenos">86</span></a>        <span class="n">class_names</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+</span><span id="extract_init_parameters-87"><a href="#extract_init_parameters-87"><span class="linenos">87</span></a>    <span class="k">return</span> <span class="n">class_names</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Pick apart a Diffusers or Transformers pipeline class and find its constituent parts (formerly root_class)</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>module</strong>:  Origin pipeline as a class or as a string</li>
+<li><strong>library</strong>:  name of a library to import the class from, only if a string is provided</li>
+</ul>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <p>Dictionary of sub-classes from the <code>module</code></p>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="ClassMapEntry">
+                            <input id="ClassMapEntry-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+                    <div class="decorator decorator-dataclass">@dataclass</div>
+
+    <span class="def">class</span>
+    <span class="name">ClassMapEntry</span>:
+
+                <label class="view-source-button" for="ClassMapEntry-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#ClassMapEntry"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ClassMapEntry-90"><a href="#ClassMapEntry-90"><span class="linenos"> 90</span></a><span class="nd">@dataclass</span>
+</span><span id="ClassMapEntry-91"><a href="#ClassMapEntry-91"><span class="linenos"> 91</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ClassMapEntry</span><span class="p">:</span>
+</span><span id="ClassMapEntry-92"><a href="#ClassMapEntry-92"><span class="linenos"> 92</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a structured entry of the name of the class and its associated attributes.&quot;&quot;&quot;</span>
+</span><span id="ClassMapEntry-93"><a href="#ClassMapEntry-93"><span class="linenos"> 93</span></a>
+</span><span id="ClassMapEntry-94"><a href="#ClassMapEntry-94"><span class="linenos"> 94</span></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="ClassMapEntry-95"><a href="#ClassMapEntry-95"><span class="linenos"> 95</span></a>    <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="ClassMapEntry-96"><a href="#ClassMapEntry-96"><span class="linenos"> 96</span></a>    <span class="n">model</span><span class="p">:</span> <span class="n">Callable</span>
+</span><span id="ClassMapEntry-97"><a href="#ClassMapEntry-97"><span class="linenos"> 97</span></a>    <span class="n">config</span><span class="p">:</span> <span class="n">Callable</span>
+</span><span id="ClassMapEntry-98"><a href="#ClassMapEntry-98"><span class="linenos"> 98</span></a>    <span class="n">config_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{})</span>
+</span><span id="ClassMapEntry-99"><a href="#ClassMapEntry-99"><span class="linenos"> 99</span></a>    <span class="n">model_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="ClassMapEntry-100"><a href="#ClassMapEntry-100"><span class="linenos">100</span></a>
+</span><span id="ClassMapEntry-101"><a href="#ClassMapEntry-101"><span class="linenos">101</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="ClassMapEntry-102"><a href="#ClassMapEntry-102"><span class="linenos">102</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span>
+</span><span id="ClassMapEntry-103"><a href="#ClassMapEntry-103"><span class="linenos">103</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">model_params</span> <span class="o">=</span> <span class="n">extract_init_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+</span><span id="ClassMapEntry-104"><a href="#ClassMapEntry-104"><span class="linenos">104</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+</span><span id="ClassMapEntry-105"><a href="#ClassMapEntry-105"><span class="linenos">105</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">config_params</span> <span class="o">=</span> <span class="n">extract_init_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Represents a structured entry of the name of the class and its associated attributes.</p>
+</div>
+
+
+                            <div id="ClassMapEntry.__init__" class="classattr">
+                                <div class="attr function">
+            
+        <span class="name">ClassMapEntry</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">model</span><span class="p">:</span> <span class="n">Callable</span>,</span><span class="param">	<span class="n">config</span><span class="p">:</span> <span class="n">Callable</span>,</span><span class="param">	<span class="n">model_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ClassMapEntry.__init__"></a>
+    
+    
+
+                            </div>
+                            <div id="ClassMapEntry.name" class="classattr">
+                                <div class="attr variable">
+            <span class="name">name</span><span class="annotation">: str</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ClassMapEntry.name"></a>
+    
+    
+
+                            </div>
+                            <div id="ClassMapEntry.model_name" class="classattr">
+                                <div class="attr variable">
+            <span class="name">model_name</span><span class="annotation">: str</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ClassMapEntry.model_name"></a>
+    
+    
+
+                            </div>
+                            <div id="ClassMapEntry.model" class="classattr">
+                                <div class="attr variable">
+            <span class="name">model</span><span class="annotation">: Callable</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ClassMapEntry.model"></a>
+    
+    
+
+                            </div>
+                            <div id="ClassMapEntry.config" class="classattr">
+                                <div class="attr variable">
+            <span class="name">config</span><span class="annotation">: Callable</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ClassMapEntry.config"></a>
+    
+    
+
+                            </div>
+                            <div id="ClassMapEntry.config_params" class="classattr">
+                                <div class="attr variable">
+            <span class="name">config_params</span><span class="annotation">: dict[str, list[str]]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ClassMapEntry.config_params"></a>
+    
+    
+
+                            </div>
+                            <div id="ClassMapEntry.model_params" class="classattr">
+                                <div class="attr variable">
+            <span class="name">model_params</span><span class="annotation">: dict[str, list[str]] | None</span>        =
+<span class="default_value">None</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ClassMapEntry.model_params"></a>
+    
+    
+
+                            </div>
+                </section>
+                <section id="DocStringEntry">
+                            <input id="DocStringEntry-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+                    <div class="decorator decorator-dataclass">@dataclass</div>
+
+    <span class="def">class</span>
+    <span class="name">DocStringEntry</span>:
+
+                <label class="view-source-button" for="DocStringEntry-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#DocStringEntry"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DocStringEntry-108"><a href="#DocStringEntry-108"><span class="linenos">108</span></a><span class="nd">@dataclass</span>
+</span><span id="DocStringEntry-109"><a href="#DocStringEntry-109"><span class="linenos">109</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DocStringEntry</span><span class="p">:</span>
+</span><span id="DocStringEntry-110"><a href="#DocStringEntry-110"><span class="linenos">110</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a structured entry of package name, file name, and docstring.&quot;&quot;&quot;</span>
+</span><span id="DocStringEntry-111"><a href="#DocStringEntry-111"><span class="linenos">111</span></a>
+</span><span id="DocStringEntry-112"><a href="#DocStringEntry-112"><span class="linenos">112</span></a>    <span class="n">package_name</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="DocStringEntry-113"><a href="#DocStringEntry-113"><span class="linenos">113</span></a>    <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="DocStringEntry-114"><a href="#DocStringEntry-114"><span class="linenos">114</span></a>    <span class="n">doc_string</span><span class="p">:</span> <span class="nb">str</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Represents a structured entry of package name, file name, and docstring.</p>
+</div>
+
+
+                            <div id="DocStringEntry.__init__" class="classattr">
+                                <div class="attr function">
+            
+        <span class="name">DocStringEntry</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">package_name</span><span class="p">:</span> <span class="nb">str</span>, </span><span class="param"><span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span>, </span><span class="param"><span class="n">doc_string</span><span class="p">:</span> <span class="nb">str</span></span>)</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DocStringEntry.__init__"></a>
+    
+    
+
+                            </div>
+                            <div id="DocStringEntry.package_name" class="classattr">
+                                <div class="attr variable">
+            <span class="name">package_name</span><span class="annotation">: str</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DocStringEntry.package_name"></a>
+    
+    
+
+                            </div>
+                            <div id="DocStringEntry.file_name" class="classattr">
+                                <div class="attr variable">
+            <span class="name">file_name</span><span class="annotation">: str</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DocStringEntry.file_name"></a>
+    
+    
+
+                            </div>
+                            <div id="DocStringEntry.doc_string" class="classattr">
+                                <div class="attr variable">
+            <span class="name">doc_string</span><span class="annotation">: str</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DocStringEntry.doc_string"></a>
+    
+    
+
+                            </div>
+                </section>
                 <section id="DocParseData">
                             <input id="DocParseData-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr class">
@@ -327,17 +724,17 @@
 
     </div>
     <a class="headerlink" href="#DocParseData"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DocParseData-53"><a href="#DocParseData-53"><span class="linenos">53</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DocParseData</span><span class="p">:</span>
-</span><span id="DocParseData-54"><a href="#DocParseData-54"><span class="linenos">54</span></a>    <span class="n">pipe_class</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="DocParseData-55"><a href="#DocParseData-55"><span class="linenos">55</span></a>    <span class="n">pipe_repo</span><span class="p">:</span> <span class="nb">str</span>
-</span><span id="DocParseData-56"><a href="#DocParseData-56"><span class="linenos">56</span></a>    <span class="n">staged_class</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="DocParseData-57"><a href="#DocParseData-57"><span class="linenos">57</span></a>    <span class="n">staged_repo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="DocParseData-58"><a href="#DocParseData-58"><span class="linenos">58</span></a>
-</span><span id="DocParseData-59"><a href="#DocParseData-59"><span class="linenos">59</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipe_class</span><span class="p">,</span> <span class="n">pipe_repo</span><span class="p">,</span> <span class="n">staged_class</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">staged_repo</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="DocParseData-60"><a href="#DocParseData-60"><span class="linenos">60</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_class</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pipe_class</span>
-</span><span id="DocParseData-61"><a href="#DocParseData-61"><span class="linenos">61</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pipe_repo</span>
-</span><span id="DocParseData-62"><a href="#DocParseData-62"><span class="linenos">62</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">staged_class</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">staged_class</span>
-</span><span id="DocParseData-63"><a href="#DocParseData-63"><span class="linenos">63</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">staged_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">staged_repo</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DocParseData-117"><a href="#DocParseData-117"><span class="linenos">117</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DocParseData</span><span class="p">:</span>
+</span><span id="DocParseData-118"><a href="#DocParseData-118"><span class="linenos">118</span></a>    <span class="n">pipe_class</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="DocParseData-119"><a href="#DocParseData-119"><span class="linenos">119</span></a>    <span class="n">pipe_repo</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="DocParseData-120"><a href="#DocParseData-120"><span class="linenos">120</span></a>    <span class="n">staged_class</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="DocParseData-121"><a href="#DocParseData-121"><span class="linenos">121</span></a>    <span class="n">staged_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="DocParseData-122"><a href="#DocParseData-122"><span class="linenos">122</span></a>
+</span><span id="DocParseData-123"><a href="#DocParseData-123"><span class="linenos">123</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipe_class</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pipe_repo</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">staged_class</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">staged_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="DocParseData-124"><a href="#DocParseData-124"><span class="linenos">124</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_class</span> <span class="o">=</span> <span class="n">pipe_class</span>
+</span><span id="DocParseData-125"><a href="#DocParseData-125"><span class="linenos">125</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_repo</span> <span class="o">=</span> <span class="n">pipe_repo</span>
+</span><span id="DocParseData-126"><a href="#DocParseData-126"><span class="linenos">126</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">staged_class</span> <span class="o">=</span> <span class="n">staged_class</span>
+</span><span id="DocParseData-127"><a href="#DocParseData-127"><span class="linenos">127</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">staged_repo</span> <span class="o">=</span> <span class="n">staged_repo</span>
 </span></pre></div>
 
 
@@ -347,17 +744,17 @@
                                         <input id="DocParseData.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">DocParseData</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">pipe_class</span>, </span><span class="param"><span class="n">pipe_repo</span>, </span><span class="param"><span class="n">staged_class</span><span class="o">=</span><span class="kc">None</span>, </span><span class="param"><span class="n">staged_repo</span><span class="o">=</span><span class="kc">None</span></span>)</span>
+        <span class="name">DocParseData</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">pipe_class</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">pipe_repo</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">staged_class</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">staged_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
 
                 <label class="view-source-button" for="DocParseData.__init__-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#DocParseData.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DocParseData.__init__-59"><a href="#DocParseData.__init__-59"><span class="linenos">59</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipe_class</span><span class="p">,</span> <span class="n">pipe_repo</span><span class="p">,</span> <span class="n">staged_class</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">staged_repo</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="DocParseData.__init__-60"><a href="#DocParseData.__init__-60"><span class="linenos">60</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_class</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pipe_class</span>
-</span><span id="DocParseData.__init__-61"><a href="#DocParseData.__init__-61"><span class="linenos">61</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pipe_repo</span>
-</span><span id="DocParseData.__init__-62"><a href="#DocParseData.__init__-62"><span class="linenos">62</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">staged_class</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">staged_class</span>
-</span><span id="DocParseData.__init__-63"><a href="#DocParseData.__init__-63"><span class="linenos">63</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">staged_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">staged_repo</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DocParseData.__init__-123"><a href="#DocParseData.__init__-123"><span class="linenos">123</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipe_class</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pipe_repo</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">staged_class</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">staged_repo</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="DocParseData.__init__-124"><a href="#DocParseData.__init__-124"><span class="linenos">124</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_class</span> <span class="o">=</span> <span class="n">pipe_class</span>
+</span><span id="DocParseData.__init__-125"><a href="#DocParseData.__init__-125"><span class="linenos">125</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_repo</span> <span class="o">=</span> <span class="n">pipe_repo</span>
+</span><span id="DocParseData.__init__-126"><a href="#DocParseData.__init__-126"><span class="linenos">126</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">staged_class</span> <span class="o">=</span> <span class="n">staged_class</span>
+</span><span id="DocParseData.__init__-127"><a href="#DocParseData.__init__-127"><span class="linenos">127</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">staged_repo</span> <span class="o">=</span> <span class="n">staged_repo</span>
 </span></pre></div>
 
 
@@ -388,7 +785,7 @@
                             </div>
                             <div id="DocParseData.staged_class" class="classattr">
                                 <div class="attr variable">
-            <span class="name">staged_class</span><span class="annotation">: Optional[str]</span>        =
+            <span class="name">staged_class</span><span class="annotation">: str | None</span>        =
 <span class="default_value">None</span>
 
         
@@ -400,7 +797,7 @@
                             </div>
                             <div id="DocParseData.staged_repo" class="classattr">
                                 <div class="attr variable">
-            <span class="name">staged_repo</span><span class="annotation">: Optional[str]</span>        =
+            <span class="name">staged_repo</span><span class="annotation">: str | None</span>        =
 <span class="default_value">None</span>
 
         
@@ -422,35 +819,38 @@
 
     </div>
     <a class="headerlink" href="#DocStringParserConstants"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DocStringParserConstants-66"><a href="#DocStringParserConstants-66"><span class="linenos">66</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DocStringParserConstants</span><span class="p">:</span>
-</span><span id="DocStringParserConstants-67"><a href="#DocStringParserConstants-67"><span class="linenos">67</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Constants used by DocStringParser for parsing docstrings.&quot;&quot;&quot;</span>
-</span><span id="DocStringParserConstants-68"><a href="#DocStringParserConstants-68"><span class="linenos">68</span></a>
-</span><span id="DocStringParserConstants-69"><a href="#DocStringParserConstants-69"><span class="linenos">69</span></a>    <span class="n">pipe_prefixes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="DocStringParserConstants-70"><a href="#DocStringParserConstants-70"><span class="linenos">70</span></a>        <span class="s2">&quot;&gt;&gt;&gt; motion_adapter = &quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-71"><a href="#DocStringParserConstants-71"><span class="linenos">71</span></a>        <span class="s2">&quot;&gt;&gt;&gt; adapter = &quot;</span><span class="p">,</span>  <span class="c1"># if this moves, also change motion_adapter check</span>
-</span><span id="DocStringParserConstants-72"><a href="#DocStringParserConstants-72"><span class="linenos">72</span></a>        <span class="s2">&quot;&gt;&gt;&gt; controlnet = &quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-73"><a href="#DocStringParserConstants-73"><span class="linenos">73</span></a>        <span class="s2">&quot;&gt;&gt;&gt; pipe_prior = &quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-74"><a href="#DocStringParserConstants-74"><span class="linenos">74</span></a>        <span class="s2">&quot;&gt;&gt;&gt; pipe = &quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-75"><a href="#DocStringParserConstants-75"><span class="linenos">75</span></a>        <span class="s2">&quot;&gt;&gt;&gt; pipeline = &quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-76"><a href="#DocStringParserConstants-76"><span class="linenos">76</span></a>        <span class="s2">&quot;&gt;&gt;&gt; blip_diffusion_pipe = &quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-77"><a href="#DocStringParserConstants-77"><span class="linenos">77</span></a>        <span class="s2">&quot;&gt;&gt;&gt; prior_pipe = &quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-78"><a href="#DocStringParserConstants-78"><span class="linenos">78</span></a>        <span class="s2">&quot;&gt;&gt;&gt; gen_pipe = &quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-79"><a href="#DocStringParserConstants-79"><span class="linenos">79</span></a>    <span class="p">]</span>
-</span><span id="DocStringParserConstants-80"><a href="#DocStringParserConstants-80"><span class="linenos">80</span></a>    <span class="n">repo_variables</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="DocStringParserConstants-81"><a href="#DocStringParserConstants-81"><span class="linenos">81</span></a>        <span class="s2">&quot;controlnet_model&quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-82"><a href="#DocStringParserConstants-82"><span class="linenos">82</span></a>        <span class="s2">&quot;controlnet_id&quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-83"><a href="#DocStringParserConstants-83"><span class="linenos">83</span></a>        <span class="s2">&quot;base_model&quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-84"><a href="#DocStringParserConstants-84"><span class="linenos">84</span></a>        <span class="s2">&quot;model_id_or_path&quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-85"><a href="#DocStringParserConstants-85"><span class="linenos">85</span></a>        <span class="s2">&quot;model_ckpt&quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-86"><a href="#DocStringParserConstants-86"><span class="linenos">86</span></a>        <span class="s2">&quot;model_id&quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-87"><a href="#DocStringParserConstants-87"><span class="linenos">87</span></a>        <span class="s2">&quot;repo_base&quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-88"><a href="#DocStringParserConstants-88"><span class="linenos">88</span></a>        <span class="s2">&quot;repo&quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-89"><a href="#DocStringParserConstants-89"><span class="linenos">89</span></a>        <span class="s2">&quot;motion_adapter_id&quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-90"><a href="#DocStringParserConstants-90"><span class="linenos">90</span></a>    <span class="p">]</span>
-</span><span id="DocStringParserConstants-91"><a href="#DocStringParserConstants-91"><span class="linenos">91</span></a>    <span class="n">call_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.from_pretrained(&quot;</span><span class="p">,</span> <span class="s2">&quot;.from_single_file(&quot;</span><span class="p">]</span>
-</span><span id="DocStringParserConstants-92"><a href="#DocStringParserConstants-92"><span class="linenos">92</span></a>    <span class="n">staged_call_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="DocStringParserConstants-93"><a href="#DocStringParserConstants-93"><span class="linenos">93</span></a>        <span class="s2">&quot;.from_pretrain(&quot;</span><span class="p">,</span>
-</span><span id="DocStringParserConstants-94"><a href="#DocStringParserConstants-94"><span class="linenos">94</span></a>    <span class="p">]</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DocStringParserConstants-130"><a href="#DocStringParserConstants-130"><span class="linenos">130</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DocStringParserConstants</span><span class="p">:</span>
+</span><span id="DocStringParserConstants-131"><a href="#DocStringParserConstants-131"><span class="linenos">131</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Constants used by DocStringParser for parsing docstrings.&quot;&quot;&quot;</span>
+</span><span id="DocStringParserConstants-132"><a href="#DocStringParserConstants-132"><span class="linenos">132</span></a>
+</span><span id="DocStringParserConstants-133"><a href="#DocStringParserConstants-133"><span class="linenos">133</span></a>    <span class="n">pipe_prefixes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="DocStringParserConstants-134"><a href="#DocStringParserConstants-134"><span class="linenos">134</span></a>        <span class="s2">&quot;&gt;&gt;&gt; motion_adapter = &quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-135"><a href="#DocStringParserConstants-135"><span class="linenos">135</span></a>        <span class="s2">&quot;&gt;&gt;&gt; adapter = &quot;</span><span class="p">,</span>  <span class="c1"># if this moves, also change motion_adapter check</span>
+</span><span id="DocStringParserConstants-136"><a href="#DocStringParserConstants-136"><span class="linenos">136</span></a>        <span class="s2">&quot;&gt;&gt;&gt; controlnet = &quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-137"><a href="#DocStringParserConstants-137"><span class="linenos">137</span></a>        <span class="s2">&quot;&gt;&gt;&gt; super_res_1_pipe = &quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-138"><a href="#DocStringParserConstants-138"><span class="linenos">138</span></a>        <span class="s2">&quot;&gt;&gt;&gt; pipe_prior = &quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-139"><a href="#DocStringParserConstants-139"><span class="linenos">139</span></a>        <span class="s2">&quot;&gt;&gt;&gt; pipe_prior_redux = &quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-140"><a href="#DocStringParserConstants-140"><span class="linenos">140</span></a>        <span class="s2">&quot;&gt;&gt;&gt; pipe = &quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-141"><a href="#DocStringParserConstants-141"><span class="linenos">141</span></a>        <span class="s2">&quot;&gt;&gt;&gt; pipeline = &quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-142"><a href="#DocStringParserConstants-142"><span class="linenos">142</span></a>        <span class="s2">&quot;&gt;&gt;&gt; blip_diffusion_pipe = &quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-143"><a href="#DocStringParserConstants-143"><span class="linenos">143</span></a>        <span class="s2">&quot;&gt;&gt;&gt; prior_pipe = &quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-144"><a href="#DocStringParserConstants-144"><span class="linenos">144</span></a>        <span class="s2">&quot;&gt;&gt;&gt; gen_pipe = &quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-145"><a href="#DocStringParserConstants-145"><span class="linenos">145</span></a>        <span class="s2">&quot;pipe = &quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-146"><a href="#DocStringParserConstants-146"><span class="linenos">146</span></a>    <span class="p">]</span>
+</span><span id="DocStringParserConstants-147"><a href="#DocStringParserConstants-147"><span class="linenos">147</span></a>    <span class="n">repo_variables</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="DocStringParserConstants-148"><a href="#DocStringParserConstants-148"><span class="linenos">148</span></a>        <span class="s2">&quot;controlnet_model&quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-149"><a href="#DocStringParserConstants-149"><span class="linenos">149</span></a>        <span class="s2">&quot;controlnet_id&quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-150"><a href="#DocStringParserConstants-150"><span class="linenos">150</span></a>        <span class="s2">&quot;base_model&quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-151"><a href="#DocStringParserConstants-151"><span class="linenos">151</span></a>        <span class="s2">&quot;model_id_or_path&quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-152"><a href="#DocStringParserConstants-152"><span class="linenos">152</span></a>        <span class="s2">&quot;model_ckpt&quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-153"><a href="#DocStringParserConstants-153"><span class="linenos">153</span></a>        <span class="s2">&quot;model_id&quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-154"><a href="#DocStringParserConstants-154"><span class="linenos">154</span></a>        <span class="s2">&quot;repo_base&quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-155"><a href="#DocStringParserConstants-155"><span class="linenos">155</span></a>        <span class="s2">&quot;repo&quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-156"><a href="#DocStringParserConstants-156"><span class="linenos">156</span></a>        <span class="s2">&quot;motion_adapter_id&quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-157"><a href="#DocStringParserConstants-157"><span class="linenos">157</span></a>    <span class="p">]</span>
+</span><span id="DocStringParserConstants-158"><a href="#DocStringParserConstants-158"><span class="linenos">158</span></a>    <span class="n">call_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.from_pretrained(&quot;</span><span class="p">,</span> <span class="s2">&quot;.from_single_file(&quot;</span><span class="p">]</span>
+</span><span id="DocStringParserConstants-159"><a href="#DocStringParserConstants-159"><span class="linenos">159</span></a>    <span class="n">staged_call_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="DocStringParserConstants-160"><a href="#DocStringParserConstants-160"><span class="linenos">160</span></a>        <span class="s2">&quot;.from_pretrain(&quot;</span><span class="p">,</span>
+</span><span id="DocStringParserConstants-161"><a href="#DocStringParserConstants-161"><span class="linenos">161</span></a>    <span class="p">]</span>
 </span></pre></div>
 
 
@@ -462,7 +862,7 @@
                                 <div class="attr variable">
             <span class="name">pipe_prefixes</span><span class="annotation">: List[str]</span>        =
 <input id="DocStringParserConstants.pipe_prefixes-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="DocStringParserConstants.pipe_prefixes-view-value"></label><span class="default_value">[&#39;&gt;&gt;&gt; motion_adapter = &#39;, &#39;&gt;&gt;&gt; adapter = &#39;, &#39;&gt;&gt;&gt; controlnet = &#39;, &#39;&gt;&gt;&gt; pipe_prior = &#39;, &#39;&gt;&gt;&gt; pipe = &#39;, &#39;&gt;&gt;&gt; pipeline = &#39;, &#39;&gt;&gt;&gt; blip_diffusion_pipe = &#39;, &#39;&gt;&gt;&gt; prior_pipe = &#39;, &#39;&gt;&gt;&gt; gen_pipe = &#39;]</span>
+            <label class="view-value-button pdoc-button" for="DocStringParserConstants.pipe_prefixes-view-value"></label><span class="default_value">[&#39;&gt;&gt;&gt; motion_adapter = &#39;, &#39;&gt;&gt;&gt; adapter = &#39;, &#39;&gt;&gt;&gt; controlnet = &#39;, &#39;&gt;&gt;&gt; super_res_1_pipe = &#39;, &#39;&gt;&gt;&gt; pipe_prior = &#39;, &#39;&gt;&gt;&gt; pipe_prior_redux = &#39;, &#39;&gt;&gt;&gt; pipe = &#39;, &#39;&gt;&gt;&gt; pipeline = &#39;, &#39;&gt;&gt;&gt; blip_diffusion_pipe = &#39;, &#39;&gt;&gt;&gt; prior_pipe = &#39;, &#39;&gt;&gt;&gt; gen_pipe = &#39;, &#39;pipe = &#39;]</span>
 
         
     </div>
@@ -551,7 +951,7 @@
                     <div class="attr variable">
             <span class="name">template</span>        =
 <input id="template-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="template-view-value"></label><span class="default_value">{&#39;domain&#39;: {&#39;dev&#39;: &#39;&#39;, &#39;info&#39;: &#39;&#39;, &#39;model&#39;: &#39;&#39;, &#39;ops&#39;: &#39;&#39;}, &#39;arch&#39;: {&#39;unclassified&#39;: {&#39;brnn&#39;: &#39;&#39;, &#39;rcnn&#39;: &#39;&#39;, &#39;gru&#39;: &#39;&#39;, &#39;rbm&#39;: &#39;&#39;, &#39;tae&#39;: &#39;&#39;, &#39;vae&#39;: &#39;&#39;, &#39;embedding&#39;: &#39;&#39;, &#39;scheduler&#39;: &#39;&#39;, &#39;resnet&#39;: &#39;&#39;}, &#39;transformer&#39;: {&#39;lstm&#39;: [&#39;sequence_kernel&#39;], &#39;detr&#39;: [&#39;use_timm_backbone&#39;, &#39;_resnet_&#39;, &#39;disable_custom_kernels&#39;, &#39;dice_loss_coefficient&#39;, &#39;decoder_method&#39;], &#39;cnn&#39;: [&#39;bbox_cost&#39;], &#39;rnn&#39;: [&#39;lru_width&#39;, &#39;rescale_every&#39;], &#39;gan&#39;: [&#39;codebook_dim&#39;, &#39;kernel_size&#39;, &#39;kernel_predictor_conv_size&#39;], &#39;ssm&#39;: [&#39;mamba_expand&#39;, &#39;parallel_attn&#39;, &#39;state_size&#39;, &#39;expand&#39;], &#39;vit&#39;: [&#39;use_swiglu_ffn&#39;, &#39;projection_dim&#39;, &#39;vlm_config&#39;, &#39;crop_size&#39;, &#39;out_indices&#39;, &#39;logit_scale_init_value&#39;, &#39;image_size&#39;, &#39;vision_config&#39;, &#39;hidden_sizes&#39;, &#39;image_token_id&#39;, &#39;patch_size&#39;, &#39;embed_dim&#39;, &#39;frequency_stride&#39;, &#39;auxiliary_channels&#39;, &#39;out_features&#39;, &#39;vision_feature_select_strategy&#39;], &#39;dpt&#39;: [&#39;fusion_hidden_size&#39;], &#39;moe&#39;: [&#39;num_experts_per_tok&#39;], &#39;aet&#39;: [&#39;classifier_proj_size&#39;, &#39;position_embedding_type&#39;, &#39;separate_cls&#39;, &#39;keypoint_detector_config&#39;, &#39;local_attention&#39;, &#39;act_dropout&#39;, &#39;max_source_positions&#39;], &#39;stst&#39;: [&#39;is_encoder_decoder&#39;, &#39;encoder_attention_heads&#39;, &#39;encoder_layers&#39;, &#39;encoder_hidden_size&#39;, &#39;encoder_config&#39;, &#39;audio_token_index&#39;, &#39;codebook_dim&#39;, &#39;router_ignore_padding_tokens&#39;, &#39;d_ff&#39;, &#39;d_kv&#39;, &#39;audio_config&#39;], &#39;art&#39;: [&#39;ffn_dim&#39;, &#39;num_codebooks&#39;, &#39;vq_config&#39;, &#39;attn_config&#39;, &#39;n_head&#39;, &#39;n_heads&#39;, &#39;n_layer&#39;, &#39;rms_norm_eps&#39;, &#39;rope_theta&#39;, &#39;head_dim&#39;, &#39;layernorm_embedding&#39;, &#39;hidden_dropout_prob&#39;, &#39;rotary_pct&#39;, &#39;embed_dropout&#39;, &#39;nb_priors&#39;, &#39;embd_pdrop&#39;, &#39;n_positions&#39;, &#39;aux_loss_coef&#39;, &#39;residual_dropout&#39;, &#39;no_rope_layers&#39;, &#39;decoder_start_token_id&#39;, &#39;decoder_layers&#39;, &#39;tie_codebooks_embeddings&#39;]}, &#39;diffuser&#39;: {&#39;lora&#39;: [&#39;motion_adapter&#39;], &#39;controlnet&#39;: [&#39;controlnet&#39;], &#39;unet&#39;: [&#39;unet&#39;, &#39;prior&#39;, &#39;decoder&#39;], &#39;dit&#39;: [&#39;transformer&#39;]}}}</span>
+            <label class="view-value-button pdoc-button" for="template-view-value"></label><span class="default_value">{&#39;domain&#39;: {&#39;dev&#39;: &#39;&#39;, &#39;info&#39;: &#39;&#39;, &#39;model&#39;: &#39;&#39;, &#39;ops&#39;: &#39;&#39;}, &#39;arch&#39;: {&#39;unclassified&#39;: {&#39;brnn&#39;: &#39;&#39;, &#39;rcnn&#39;: &#39;&#39;, &#39;gru&#39;: &#39;&#39;, &#39;rbm&#39;: &#39;&#39;, &#39;tae&#39;: &#39;&#39;, &#39;vae&#39;: &#39;&#39;, &#39;embedding&#39;: &#39;&#39;, &#39;scheduler&#39;: &#39;&#39;, &#39;resnet&#39;: &#39;&#39;}, &#39;transformer&#39;: {&#39;mlp&#39;: [&#39;prediction_channel_indices&#39;], &#39;lstm&#39;: [&#39;sequence_kernel&#39;], &#39;detr&#39;: [&#39;use_timm_backbone&#39;, &#39;_resnet_&#39;, &#39;disable_custom_kernels&#39;, &#39;dice_loss_coefficient&#39;, &#39;decoder_method&#39;], &#39;cnn&#39;: [&#39;bbox_cost&#39;], &#39;rnn&#39;: [&#39;lru_width&#39;, &#39;rescale_every&#39;], &#39;gan&#39;: [&#39;codebook_dim&#39;, &#39;kernel_size&#39;, &#39;kernel_predictor_conv_size&#39;], &#39;ssm&#39;: [&#39;mamba_expand&#39;, &#39;parallel_attn&#39;, &#39;state_size&#39;, &#39;expand&#39;], &#39;vit&#39;: [&#39;use_swiglu_ffn&#39;, &#39;projection_dim&#39;, &#39;vlm_config&#39;, &#39;crop_size&#39;, &#39;fpn_hidden_size&#39;, &#39;out_indices&#39;, &#39;logit_scale_init_value&#39;, &#39;image_size&#39;, &#39;vision_config&#39;, &#39;hidden_sizes&#39;, &#39;image_token_id&#39;, &#39;patch_size&#39;, &#39;embed_dim&#39;, &#39;frequency_stride&#39;, &#39;auxiliary_channels&#39;, &#39;out_features&#39;, &#39;vision_feature_select_strategy&#39;], &#39;dpt&#39;: [&#39;fusion_hidden_size&#39;], &#39;moe&#39;: [&#39;num_experts_per_tok&#39;, &#39;num_experts&#39;, &#39;moe_intermediate_size&#39;], &#39;aet&#39;: [&#39;classifier_proj_size&#39;, &#39;position_embedding_type&#39;, &#39;separate_cls&#39;, &#39;keypoint_detector_config&#39;, &#39;local_attention&#39;, &#39;act_dropout&#39;, &#39;max_source_positions&#39;, &#39;classifier_pooling&#39;, &#39;ctc_loss_reduction&#39;, &#39;audio_video_config&#39;, &#39;video_config&#39;], &#39;stst&#39;: [&#39;is_encoder_decoder&#39;, &#39;encoder_attention_heads&#39;, &#39;encoder_layers&#39;, &#39;encoder_hidden_size&#39;, &#39;encoder_config&#39;, &#39;ctc_loss_reduction&#39;, &#39;ctc_zero_infinity&#39;, &#39;audio_token_index&#39;, &#39;codebook_dim&#39;, &#39;router_ignore_padding_tokens&#39;, &#39;d_ff&#39;, &#39;d_kv&#39;, &#39;vocoder_config&#39;, &#39;prompt_length&#39;, &#39;audio_config&#39;, &#39;convolution_bias&#39;, &#39;rope_parameters&#39;, &#39;hotstart_dup_thresh&#39;], &#39;art&#39;: [&#39;ffn_dim&#39;, &#39;num_codebooks&#39;, &#39;vq_config&#39;, &#39;attn_config&#39;, &#39;n_head&#39;, &#39;act_dim&#39;, &#39;n_heads&#39;, &#39;n_layer&#39;, &#39;rms_norm_eps&#39;, &#39;rope_theta&#39;, &#39;head_dim&#39;, &#39;layernorm_embedding&#39;, &#39;hidden_dropout_prob&#39;, &#39;rotary_pct&#39;, &#39;audio_encoder&#39;, &#39;embed_dropout&#39;, &#39;nb_priors&#39;, &#39;resid_pdrop&#39;, &#39;embd_pdrop&#39;, &#39;action_tanh&#39;, &#39;n_positions&#39;, &#39;aux_loss_coef&#39;, &#39;residual_dropout&#39;, &#39;no_rope_layers&#39;, &#39;decoder_start_token_id&#39;, &#39;decoder_layers&#39;, &#39;tie_codebooks_embeddings&#39;]}, &#39;diffuser&#39;: {&#39;lora&#39;: [&#39;motion_adapter&#39;], &#39;controlnet&#39;: [&#39;controlnet&#39;], &#39;unet&#39;: [&#39;unet&#39;, &#39;prior&#39;, &#39;decoder&#39;], &#39;dit&#39;: [&#39;transformer&#39;]}}}</span>
 
         
     </div>

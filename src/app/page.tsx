@@ -112,6 +112,9 @@ const Page = () => {
         <section id="divisor">
           <SectionDescription><b>divisor</b> is an interactive denoiser.</SectionDescription>
         </section>
+        <section id="Documentation">
+          <SectionDescription>Explore our <a href="/docs" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">documentation</a>.</SectionDescription>
+        </section>
         <section id="source">
           <SectionDescription>Check out our source code on <a href="https://github.com/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">GitHub</a>.</SectionDescription>
         </section>

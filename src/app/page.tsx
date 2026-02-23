@@ -101,16 +101,19 @@ const Page = () => {
           <p className="mt-20 mb-4 pb-5 text-left">
             Umbrella organization rethinking machine-learning tools that work for people, not corporations.
           </p></SectionHeader>
-          <SectionDescription><b>Shadowbox</b> is an ANN instrument.</SectionDescription>
+          <SectionDescription><b>Shadowbox</b> is an arificial neural network instrument.</SectionDescription>
         </section>
         <section id="mir">
-          <SectionDescription><b>MIR</b> is a URI taxonomy of ANN models.</SectionDescription>
-        </section>
-        <section id="nnll">
-          <SectionDescription><b>nnll</b> is a collection of tools for model analysis and inference.</SectionDescription>
+          <SectionDescription><b>MIR</b> is a URI taxonomy of neural network models.</SectionDescription>
         </section>
         <section id="divisor">
           <SectionDescription><b>divisor</b> is an interactive denoiser.</SectionDescription>
+        </section>
+        <section id="negate">
+          <SectionDescription><b>negate</b> is a synthetic image detector.</SectionDescription>
+        </section>
+        <section id="nnll">
+          <SectionDescription><b>nnll</b> is a collection of tools for model analysis and inference.</SectionDescription>
         </section>
         <section id="Documentation">
           <SectionDescription>Explore our <a href="/docs" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">documentation</a>.</SectionDescription>

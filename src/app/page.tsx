@@ -96,33 +96,38 @@ const Page = () => {
         <div className="text-4xl md:text-3xl lg:text-3xl min-text-[20pt] max-h-[2vw] font-bold mb-20 md:mb-0 r-10 w-full text-center md:text-right tracking-widest">darkshapes
           <p className="text-[.6em] md:text-[.5em] font-sans mb-0">we build our answers</p>
         </div>
-        <section id="shadowbox">
+        <section id="header">
           <SectionHeader>
           <p className="mt-20 mb-4 pb-5 text-left">
             Umbrella organization rethinking machine-learning tools that work for people, not corporations.
           </p></SectionHeader>
-          <SectionDescription><b>Shadowbox</b> is an arificial neural network instrument.</SectionDescription>
+          </section>
+          <section id="sdbx">
+          <SectionDescription><b>Shadowbox</b> is a generative neural network instrument.</SectionDescription>
         </section>
         <section id="mir">
           <SectionDescription><b>MIR</b> is a URI taxonomy of neural network models.</SectionDescription>
         </section>
-        <section id="divisor">
-          <SectionDescription><b>divisor</b> is an interactive denoiser.</SectionDescription>
+        <section id="dvzr">
+          <SectionDescription><b>Divisor</b> is an interactive denoiser.</SectionDescription>
         </section>
-        <section id="negate">
-          <SectionDescription><b>negate</b> is a synthetic image detector.</SectionDescription>
+        <section id="ngte">
+          <SectionDescription><b>Negate</b> is a synthetic image detector.</SectionDescription>
         </section>
         <section id="nnll">
-          <SectionDescription><b>nnll</b> is a collection of tools for model analysis and inference.</SectionDescription>
+          <SectionDescription><b>NNLL</b> is a collection of tools for model analysis and inference.</SectionDescription>
         </section>
-        <section id="Documentation">
-          <SectionDescription>Explore our <a href="/docs" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">documentation</a>.</SectionDescription>
+        <section id="documentation">
+          <SectionDescription>Read our software <a href="/docs" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">Documentation</a>.</SectionDescription>
         </section>
-        <section id="source">
-          <SectionDescription>Check out our source code on <a href="https://github.com/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">GitHub</a>.</SectionDescription>
+        <section id="software">
+          <SectionDescription>Download our software from <a href="https://github.com/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">GitHub</a>.</SectionDescription>
+        </section>
+        <section id="progress">
+          <SectionDescription>Track responsible AI progress on <a href="https://hf.co/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">HuggingFace</a>.</SectionDescription>
         </section>
         <section id="chat">
-          <SectionDescription className="mb-10 md:mb-10">Find us on <a href="https://discord.gg/RYaJw9mPPe" className="text-blue-500 hover:text-blue-600">Discord</a>.</SectionDescription>
+          <SectionDescription className="mb-10 md:mb-10">Speak with us on <a href="https://discord.gg/RYaJw9mPPe" className="text-blue-500 hover:text-blue-600">Discord</a>.</SectionDescription>
         </section>
       </Content>
     </Container>

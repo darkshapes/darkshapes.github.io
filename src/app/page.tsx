@@ -92,9 +92,10 @@ const Page = () => {
         alignItems: 'center',
         transformOrigin: 'center center',
         transition: 'transform 0.3s ease-out',
+
       }} >
-        <div className="text-4xl md:text-3xl lg:text-3xl min-text-[20pt] max-h-[2vw] font-bold mb-20 md:mb-0 r-10 w-full text-center md:text-right tracking-widest">darkshapes
-          <p className="text-[.6em] md:text-[.5em] font-sans mb-0">we build our answers</p>
+        <div className="max-h-[4vw] font-bold mb-20 md:mb-0 r-10 w-full text-center md:text-right"><p className="text-7xl tracking-tighter">Darkshapes</p>
+          <p className="lg:text-3xl font-sans mb-0 tracking-widest">we build our answers</p>
         </div>
         <section id="header">
           <SectionHeader>
@@ -111,6 +112,9 @@ const Page = () => {
         <section id="dvzr">
           <SectionDescription><b>Divisor</b> is an interactive denoiser.</SectionDescription>
         </section>
+        <section id="zdac">
+          <SectionDescription><b>Zodiac</b> is a self-arranging neural network sequencer.</SectionDescription>
+        </section>
         <section id="ngte">
           <SectionDescription><b>Negate</b> is a synthetic image detector.</SectionDescription>
         </section>
@@ -121,7 +125,7 @@ const Page = () => {
           <SectionDescription>Read our software <a href="/docs" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">Documentation</a>.</SectionDescription>
         </section>
         <section id="software">
-          <SectionDescription>Download our software from <a href="https://github.com/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">GitHub</a>.</SectionDescription>
+          <SectionDescription>Download our software from <a href="https://github.com/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">GitHub</a> or <a href="https://codeberg.org/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">Codeberg</a> .</SectionDescription>
         </section>
         <section id="progress">
           <SectionDescription>Track responsible AI progress on <a href="https://hf.co/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">HuggingFace</a>.</SectionDescription>

@@ -104,7 +104,7 @@ const Page = () => {
           </p></SectionHeader>
           </section>
         <section id='salon' className='mt-0 mb-10'>
-          <SectionHeader><p>Our collective of artists, engineers, writers, and scientists blend expertise to spark honest discussions, bold critiques, and collaboration that fuels radically new art and software projects. By fostering community knowledge we challenge the status quo and redefine techno-social ethics.</p>
+          <SectionHeader><p>We are artists, engineers, writers, and scientists — the creative and curious of the 21st-century — exploring community knowledge as a catalyst for developing radically new media and software that challenges the status quo and redefines techno-social ethics.</p>
 </SectionHeader>
 <section id="for"><SectionHeader><p className='mt-5'>For the creative and curious of the 21st century.</p></SectionHeader></section>
         </section>

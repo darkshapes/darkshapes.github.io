@@ -99,31 +99,21 @@ const Page = () => {
         </div>
         <section id="header">
           <SectionHeader>
-          <p className="mt-20 mb-4 pb-5 text-left">
+          <p className="mt-30 mb-0 pb-5 text-left lg:text">
             Umbrella organization rethinking machine-learning tools that work for people, not corporations.
           </p></SectionHeader>
           </section>
-          <section id="sdbx">
-          <SectionDescription><b>Shadowbox</b> is a generative neural network instrument.</SectionDescription>
-        </section>
-        <section id="mir">
-          <SectionDescription><b>MIR</b> is a URI taxonomy of neural network models.</SectionDescription>
-        </section>
-        <section id="dvzr">
-          <SectionDescription><b>Divisor</b> is an interactive denoiser.</SectionDescription>
-        </section>
-        <section id="zdac">
-          <SectionDescription><b>Zodiac</b> is a self-arranging neural network sequencer.</SectionDescription>
-        </section>
-        <section id="ngte">
-          <SectionDescription><b>Negate</b> is a synthetic image detector.</SectionDescription>
-        </section>
-        <section id="nnll">
-          <SectionDescription><b>NNLL</b> is a collection of tools for model analysis and inference.</SectionDescription>
+        <section id='salon' className='mt-0 mb-10'>
+          <SectionHeader><p>Our collective of artists, engineers, writers, and scientists blend expertise to spark honest discussions, bold critiques, and collaboration that fuels radically new art and software projects. By fostering community knowledge we challenge the status quo and redefine techno-social ethics.</p>
+</SectionHeader>
+<section id="for"><SectionHeader><p className='mt-5'>For the creative and curious of the 21st century.</p></SectionHeader></section>
         </section>
         <section id="documentation">
           <SectionDescription>Read our software <a href="/docs" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">Documentation</a>.</SectionDescription>
         </section>
+        <section id="research">
+          <SectionDescription>Explore our link map on <a href="https://www.tldraw.com/p/buk-uYBmC1A_Q3i51cwHq?d=v5008.3963.5071.3165.page"  target="_blank"  className="text-blue-500 hover:text-blue-600">TLDraw</a>.</SectionDescription>
+          </section>
         <section id="software">
           <SectionDescription>Download our software from <a href="https://github.com/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">GitHub</a> or <a href="https://codeberg.org/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">Codeberg</a> .</SectionDescription>
         </section>
@@ -131,7 +121,7 @@ const Page = () => {
           <SectionDescription>Track responsible AI at our hub on <a href="https://hf.co/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">HuggingFace</a>.</SectionDescription>
         </section>
         <section id="chat">
-          <SectionDescription className="mb-10 md:mb-10">Speak with us on <a href="https://discord.gg/RYaJw9mPPe" className="text-blue-500 hover:text-blue-600">Discord</a>.</SectionDescription>
+          <SectionDescription className="mb-10 md:mb-10">Join us on <a href="https://discord.gg/RYaJw9mPPe" className="text-blue-500 hover:text-blue-600">Discord</a>.</SectionDescription>
         </section>
       </Content>
     </Container>

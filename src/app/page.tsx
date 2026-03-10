@@ -19,7 +19,7 @@ const Container = tw.div`
 `
 
 const Hero = tw.div`
-  h-[50vh]
+  h-[30vh] lg:h-[50vh] md:h-[30vh] sm:h-[30vh]
   flex items-stretch justify-center align-center text-center
   text-white bg-neutral-900
   m-auto
@@ -92,20 +92,23 @@ const Page = () => {
         alignItems: 'center',
         transformOrigin: 'center center',
         transition: 'transform 0.3s ease-out',
+        width: window.innerWidth >= 768 ? '' : '100%', // Only 100% on md+
 
       }} >
-        <div className="max-h-[4vw] font-bold mb-20 md:mb-0 r-10 w-full text-center md:text-right"><p className="text-7xl tracking-tighter">Darkshapes</p>
-          <p className="lg:text-3xl font-sans mb-0 tracking-widest">we build our answers</p>
-        </div>
+        <section id="title">
+          <SectionHeader className="max-h-[4vw] font-bold mb-20 md:mb-0 r-10 w-full text-center md:text-right">
+            <p className="text-7xl tracking-tighter">Darkshapes</p>
+            <p className="lg:text-3xl font-sans tracking-widest">we build our answers</p>
+          </SectionHeader>
+        </section>
         <section id="header">
-          <SectionHeader>
-          <p className="mt-30 mb-0 pb-5 text-left lg:text">
-            Umbrella organization rethinking machine-learning tools that work for people, not corporations.
-          </p></SectionHeader>
+          <SectionHeader className="mt-10 pt-10 pb-5 text-left lg:text">
+            Umbrella organization rethinking machine-learning tools that work for people, not corporations.</SectionHeader>
           </section>
         <section id='salon' className='mt-0 mb-10'>
-          <SectionHeader><p>We are artists, engineers, writers, and scientists — the creative and curious of the 21st-century — exploring community knowledge as a catalyst for developing radically new media and software that challenges the status quo and redefines techno-social ethics.</p>
-</SectionHeader></section>
+          <SectionHeader>
+            <p>We are artists, engineers, writers, and scientists — the creative and curious of the 21st-century — exploring community knowledge as a catalyst for developing radically new media and software that challenges the status quo and redefines techno-social ethics.</p>
+          </SectionHeader></section>
         <section id="documentation">
           <SectionDescription>Read our software <a href="/docs" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">Documentation</a>.</SectionDescription>
         </section>
@@ -119,7 +122,7 @@ const Page = () => {
           <SectionDescription>Track responsible AI at our hub on <a href="https://hf.co/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">HuggingFace</a>.</SectionDescription>
         </section>
         <section id="chat">
-          <SectionDescription className="mb-10 md:mb-10">Join us on <a href="https://discord.gg/RYaJw9mPPe" className="text-blue-500 hover:text-blue-600">Discord</a>.</SectionDescription>
+          <SectionDescription className="md:mb-10">Join us on <a href="https://discord.gg/RYaJw9mPPe" className="text-blue-500 hover:text-blue-600">Discord</a>.</SectionDescription>
         </section>
       </Content>
     </Container>

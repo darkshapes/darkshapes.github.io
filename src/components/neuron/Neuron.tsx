@@ -255,7 +255,7 @@ const Neuron = () => (
     gl={{ alpha: true, antialias: true, powerPreference: "low-power" }}
     camera={{ position: [0, 0, 4], near: 0.1, far: 2000 }}
     dpr={[1, 1.5]}
-    style={{ width: "100%", height: "100%", background: "transparent" }}
+    style={{ width: "100vw", height: "100%", background: "transparent" }}
   >
     <Suspense fallback={null}>
       <FrustumShift ratio={0.26} />

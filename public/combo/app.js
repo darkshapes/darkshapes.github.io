@@ -84,13 +84,20 @@ class MultiTouchSlider {
                 options = { items: ['red', 'green', 'blue', 'yellow', 'purple'] };
             }
             
-            this.channels.set(key, {
+            const channelObj = {
                 element: el,
                 display: el.querySelector('.channel-display'),
                 indicator: el.querySelector('.channel-indicator'),
                 value: new SliderValue(type, options),
                 startY: null
-            });
+            };
+            
+            if (type === 'bool') {
+                channelObj.element.classList.add('bool-false');
+            }
+            
+            this.channels.set(key, channelObj);
+            this.updateChannelDisplay(channelObj);
         });
     }
     
@@ -166,7 +173,7 @@ class MultiTouchSlider {
     
     handlePointerDown(e) {
         const channelEl = e.target.closest('.channel');
-        if (!channelEl) return;
+        if (!channelEl || e.pointerType === 'touch') return;
         
         const arrayId = channelEl.closest('.slider-array').id;
         const channelIndex = parseInt(channelEl.dataset.channel);
@@ -176,17 +183,18 @@ class MultiTouchSlider {
         if (!channel) return;
         
         channel.element.classList.add('active');
-        channel.setPointerCapture(e.pointerId);
+        channel.element.setPointerCapture(e.pointerId);
         this.activeTouches.set(e.pointerId, {
             key,
             startY: e.clientY,
-            startRaw: channel.value.getRawPercentage()
+            startRaw: channel.value.getRawPercentage(),
+            element: channel.element
         });
     }
     
     handlePointerMove(e) {
         const touchData = this.activeTouches.get(e.pointerId);
-        if (!touchData) return;
+        if (!touchData || e.pointerType === 'touch') return;
         
         const channel = this.channels.get(touchData.key);
         if (!channel) return;
@@ -204,10 +212,10 @@ class MultiTouchSlider {
         const touchData = this.activeTouches.get(e.pointerId);
         if (!touchData) return;
         
-        const channel = this.channels.get(touchData.key);
-        if (channel) {
-            channel.element.classList.remove('active');
-            channel.releasePointerCapture(e.pointerId);
+        const element = touchData.element;
+        if (element) {
+            element.classList.remove('active');
+            element.releasePointerCapture(e.pointerId);
         }
         this.activeTouches.delete(e.pointerId);
     }
@@ -218,7 +226,14 @@ class MultiTouchSlider {
         channel.display.textContent = channel.value.getDisplay();
         
         if (channel.value.type === 'bool') {
-            channel.display.style.color = pct > 0.5 ? 'var(--active-color)' : 'var(--text-color)';
+            const isTrue = pct > 0.5;
+            channel.display.style.color = isTrue ? 'var(--active-color)' : 'var(--text-color)';
+            channel.display.style.textShadow = isTrue ? '0 0 10px var(--active-color)' : '0 1px 2px rgba(0, 0, 0, 0.5)';
+            channel.element.classList.remove('bool-true', 'bool-false');
+            channel.element.classList.add(isTrue ? 'bool-true' : 'bool-false');
+        } else {
+            channel.display.style.color = 'var(--text-color)';
+            channel.display.style.textShadow = '0 1px 2px rgba(0, 0, 0, 0.5)';
         }
     }
 }

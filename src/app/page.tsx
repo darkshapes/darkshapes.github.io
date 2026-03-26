@@ -113,7 +113,7 @@ const Page = () => {
           <SectionDescription>Read our software <a href="/docs" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">Documentation</a>.</SectionDescription>
         </section>
         <section id="research">
-          <SectionDescription>Explore our link map on <a href="https://www.tldraw.com/p/buk-uYBmC1A_Q3i51cwHq?d=v-2573.-696.7238.5324.page"  target="_blank"  className="text-blue-500 hover:text-blue-600">TLDraw</a>.</SectionDescription>
+          <SectionDescription>Explore our link map on <a href="https://www.tldraw.com/p/buk-uYBmC1A_Q3i51cwHq?d=v-2573.-696.7238.5324.page" target="_blank"  className="text-blue-500 hover:text-blue-600">TLDraw</a>.</SectionDescription>
           </section>
         <section id="software">
           <SectionDescription>Download our software from <a href="https://github.com/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">GitHub</a> or <a href="https://codeberg.org/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">Codeberg</a> .</SectionDescription>

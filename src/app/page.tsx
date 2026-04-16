@@ -110,19 +110,19 @@ const Page = () => {
             <p>We are artists, engineers, writers, and scientists — the creative and curious of the 21st-century — exploring community knowledge as a catalyst for developing radically new media and software that challenges the status quo and redefines techno-social ethics.</p>
           </SectionHeader></section>
         <section id="documentation">
-          <SectionDescription>Read our software <a href="/docs" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">Documentation</a>.</SectionDescription>
+          <SectionDescription>Read our software <a href="/docs" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">Documentation↗</a>.</SectionDescription>
         </section>
         <section id="research">
-          <SectionDescription>Explore our link map on <a href="https://www.tldraw.com/p/buk-uYBmC1A_Q3i51cwHq?d=v-2573.-696.7238.5324.page" target="_blank"  className="text-blue-500 hover:text-blue-600">TLDraw</a>.</SectionDescription>
+          <SectionDescription>Explore our link map on <a href="https://www.tldraw.com/p/buk-uYBmC1A_Q3i51cwHq?d=v-2573.-696.7238.5324.page" target="_blank"  className="text-blue-500 hover:text-blue-600">TLDraw↗</a>.</SectionDescription>
           </section>
         <section id="software">
-          <SectionDescription>Download our software from <a href="https://github.com/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">GitHub</a> or <a href="https://codeberg.org/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">Codeberg</a> .</SectionDescription>
+          <SectionDescription>Download our software from <a href="https://github.com/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">GitHub↗</a> or <a href="https://codeberg.org/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">Codeberg↗</a> .</SectionDescription>
         </section>
         <section id="progress">
-          <SectionDescription>Track responsible AI at our hub on <a href="https://hf.co/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">HuggingFace</a>.</SectionDescription>
+          <SectionDescription>Track responsible AI at our hub on <a href="https://hf.co/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">HuggingFace↗</a>.</SectionDescription>
         </section>
         <section id="chat">
-          <SectionDescription className="md:mb-10">Join us on <a href="https://discord.gg/RYaJw9mPPe" className="text-blue-500 hover:text-blue-600">Discord</a>.</SectionDescription>
+          <SectionDescription className="md:mb-10">Join us on <a href="https://discord.gg/RYaJw9mPPe" className="text-blue-500 hover:text-blue-600">Discord↗</a>.</SectionDescription>
         </section>
       </Content>
     </Container>

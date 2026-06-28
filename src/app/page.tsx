@@ -52,6 +52,8 @@ const Page = () => {
     maskSize: '100vh',
   })
 
+  const [contentWidth, setContentWidth] = useState('')
+
   useEffect(() => {
     const updateStyle = () => {
       const isSmallScreen = window.innerWidth < 768
@@ -64,6 +66,15 @@ const Page = () => {
     updateStyle() // initial run
     window.addEventListener('resize', updateStyle)
     return () => window.removeEventListener('resize', updateStyle)
+  }, [])
+
+  useEffect(() => {
+    const updateContentWidth = () => {
+      setContentWidth(window.innerWidth >= 768 ? '' : '100%')
+    }
+    updateContentWidth()
+    window.addEventListener('resize', updateContentWidth)
+    return () => window.removeEventListener('resize', updateContentWidth)
   }, [])
 
   return (
@@ -92,7 +103,7 @@ const Page = () => {
         alignItems: 'center',
         transformOrigin: 'center center',
         transition: 'transform 0.3s ease-out',
-        width: window.innerWidth >= 768 ? '' : '100%', // Only 100% on md+
+        width: contentWidth,
 
       }} >
         <section id="title">
@@ -109,8 +120,8 @@ const Page = () => {
           <SectionHeader>
             <p>We are artists, engineers, writers, and scientists — the creative and curious of the 21st-century — exploring community knowledge as a catalyst for developing radically new media and software that challenges the status quo and redefines techno-social ethics.</p>
           </SectionHeader></section>
-        <section id="documentation">
-          <SectionDescription>Read our software <a href="/docs" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">Documentation↗</a>.</SectionDescription>
+        <section id="chat">
+          <SectionDescription className="md:mb-10">Join us on <a href="https://discord.gg/RYaJw9mPPe" className="text-blue-500 hover:text-blue-600">Discord↗</a>.</SectionDescription>
         </section>
         <section id="research">
           <SectionDescription>Explore our link map on <a href="https://www.tldraw.com/p/buk-uYBmC1A_Q3i51cwHq?d=v-2573.-696.7238.5324.page" target="_blank"  className="text-blue-500 hover:text-blue-600">TLDraw↗</a>.</SectionDescription>
@@ -121,8 +132,8 @@ const Page = () => {
         <section id="progress">
           <SectionDescription>Track responsible AI at our hub on <a href="https://hf.co/darkshapes" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">HuggingFace↗</a>.</SectionDescription>
         </section>
-        <section id="chat">
-          <SectionDescription className="md:mb-10">Join us on <a href="https://discord.gg/RYaJw9mPPe" className="text-blue-500 hover:text-blue-600">Discord↗</a>.</SectionDescription>
+        <section id="documentation">
+          <SectionDescription>Read our software <a href="/docs" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">Documentation↗</a>.</SectionDescription>
         </section>
       </Content>
     </Container>
